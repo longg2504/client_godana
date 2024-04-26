@@ -1,0 +1,152 @@
+.MuiPaper-elevation {
+    margin-top: -26px;
+}
+
+.MuiMobileStepper-dots {
+    z-index: 99;
+}
+
+.stepper-button {
+    margin-top: -100% !important;
+    color: #747474 !important;
+}
+
+.MuiSvgIcon-root {
+    background: #f0f0f0 !important;
+    border-radius: 50% !important;
+    width: 1.4em !important;
+    height: 1.4em !important;
+    z-index: 999 !important;
+    transition: transform ease-in 0.3s;
+    /* opacity: 0; */
+}
+
+.MuiSvgIcon-root:hover {
+    transform: scale(1.3);
+}
+
+/* 
+.img:hover MuiSvgIcon-root {
+    opacity: 1 !important;
+}
+
+.stepper-button {
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 99;
+}
+
+.img:hover + .stepper-button {
+    opacity: 1;
+    z-index: 99;
+}
+
+.house-slider-container:hover .stepper-button {
+    opacity: 1;
+} */
+
+.css-114p2tk-MuiMobileStepper-dot {
+    background: black;
+}
+
+.MuiMobileStepper-dotActive {
+    background: white !important;
+}
+
+
+.stepper-button:disabled {
+    cursor: not-allowed;
+}
+
+/* .stepper-button {
+    opacity: 0 ;
+}
+
+.img:hover .stepper-button{
+    opacity: 1 ;
+} */
+
+.div-show-map-details-on-list{
+    position: absolute !important;
+    left: 30% !important;
+    top: 27% !important;
+    width: 14% !important;
+    z-index: 99 !important;
+}
+
+.icon-conmemya{
+    color: revert;
+    position: absolute !important;
+    top: 37% !important;
+    right: 87% !important;
+}
+
+.img{
+    border-radius: 20px !important;
+}
+
+.stepper-button2{
+    margin-top: -54% !important;
+    color: black !important;
+}
+
+.btn-create-new-a-wish-list{
+    width: 100%;
+    background: black;
+    color: white;
+    padding: 15px 0px;
+    font-size: 20px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.btn-create-new-a-wish-list:hover{
+    background: #4d4949;
+}
+
+.btn-confirm-create-new-a-wish-list{
+    padding: 10px 20px;
+    background: black;
+    color: white;
+    font-size: 20px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+.btn-confirm-create-new-a-wish-list:hover{
+    background: #4d4a4a;
+}
+
+.btn-delete-characters{
+    padding: 10px 20px;
+    background: white;
+    font-size: 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    text-decoration: underline;
+    border: none;
+}
+.btn-delete-characters:hover{
+    background: #c5c3bf57;
+}
+.css-65zm2q-JoyTextarea-root{
+    background: white !important;
+}
+
+.div-contain-wish-lists{
+    max-height: 370px;
+    overflow-y: auto;
+}
+
+.custom-toast-create-new-wish-list-success{
+    background: black !important;
+    color: white !important;
+}
+
+.listing {
+     box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+.listing-header {
+    display: block;
+    text-align: center;
+}
