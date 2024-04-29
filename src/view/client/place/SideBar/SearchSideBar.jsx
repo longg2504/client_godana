@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Form, Button } from "react-bootstrap";
-import { usePlace } from "../../../context/PlaceContext";
+import { usePlace } from "../../../../context/PlaceContext";
 
 const SearchSidebar = () => {
  const {rating, district, ward, address ,setDistrict, setRating, setAddress, setWard} = usePlace();

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import Header from "./Header";
-import PlaceList from "./PlaceList";
+import Header from "./Header/Header";
+import PlaceList from "./PlaceList/PlaceList";
 import "./css/Client.css";
 import markerIcon from "../../../images/marker.png";
 import L from "leaflet";

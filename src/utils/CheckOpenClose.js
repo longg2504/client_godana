@@ -12,6 +12,18 @@ export default function checkOpenClose(startTime, endTime) {
     var endHour = parseInt(endSplit[0], 10);
     var endMinute = parseInt(endSplit[1], 10);
 
+
+    var starSplit = startTime.split(":");
+    var hourStart = starSplit[0];
+    var minuteStart = starSplit[1];
+
+    var endSplit = endTime.split(":");
+    var hourEnd = endSplit[0];
+    var minuteEnd = endSplit[1];
+
+
+
+
     // Tính toán giờ và phút hiện tại thành phút
     var currentTimeInMinutes = currentHour * 60 + currentMinute;
     var startTimeInMinutes = startHour * 60 + startMinute;
@@ -20,10 +32,13 @@ export default function checkOpenClose(startTime, endTime) {
     if(startTime == "00:00:00" && endTime == "23:59:00"){
         return `Mở cả ngày`
     }
+    if(startTime == "00:00" && endTime == "23:59"){
+        return `Mở cả ngày`
+    }
     // Kiểm tra xem thời gian hiện tại có nằm trong khoảng cho phép hay không
     if (currentTimeInMinutes >= startTimeInMinutes && currentTimeInMinutes <= endTimeInMinutes) {
-        return `Mở cửa - Đóng cửa lúc: ${endTime}`;
+        return `Mở cửa - Đóng cửa lúc: ${hourEnd + ':' + minuteEnd}`;
     } else {
-        return `Đóng cửa - Mở cửa lúc: ${startTime}`;
+        return `Đóng cửa - Mở cửa lúc: ${hourStart + ':' + minuteStart}`;
     }
 }

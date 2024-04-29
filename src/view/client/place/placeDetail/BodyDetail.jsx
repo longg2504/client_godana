@@ -14,16 +14,20 @@ import ImageListItemBar from "@mui/material/ImageListItemBar";
 import startRating from '../../../../utils/StarRating';
 import splitTime from "../../../../utils/SplitTime";
 import checkOpenClose from "../../../../utils/CheckOpenClose";
+import CreateReview from "./CreateReview";
 
 export default function BodyDetail() {
   const [place, setPlace] = useState({});
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
   const [placeReivew, setPlaceReviews] = useState([]);
   const [isOverlayReviews, setIsOVerlayReviews] = useState(false);
+  const [isOverlayCreateReviews, setIsOVerlayCreateReviews] = useState(false);
   const [isOverLayImages, setIsOverLayImages] = useState(false);
   const [isOverLayImagesSlider, setIsOverLayImagesSlider] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+
+  const jwt = localStorage.getItem('jwt')
   const { placeId } = useParams();
 
   useEffect(() => {
@@ -76,6 +80,18 @@ export default function BodyDetail() {
   const toggleOverlayReviews = () => {
     setIsOVerlayReviews(!isOverlayReviews);
     if (!isOverlayReviews) {
+      document.querySelector(".leaflet-control").style.display = "none";
+      document.querySelector(".leaflet-control-attribution").style.display =
+        "none";
+    } else {
+      document.querySelector(".leaflet-control").style = "block";
+      document.querySelector(".leaflet-control-attribution").style = "block";
+    }
+  };
+
+  const toggleOverlayCreateReviews = () => {
+    setIsOVerlayCreateReviews(!isOverlayCreateReviews);
+    if (!isOverlayCreateReviews) {
       document.querySelector(".leaflet-control").style.display = "none";
       document.querySelector(".leaflet-control-attribution").style.display =
         "none";
@@ -306,7 +322,7 @@ export default function BodyDetail() {
                     <li>Email: {place.contact?.email ? <a href={place.contact?.email}> {place.contact?.email} </a> : "Không có thông tin"} </li>
                     <li>Phone: {place.contact?.phone ?  place.contact?.phone  : "Không có thông tin"} </li>
                     <li>Website: {place.contact?.website ? <a href={place.contact?.website}> {place.contact?.website} </a> : "Không có thông tin"} </li>
-                    <li>Thời gian hoạt động: {place.contact?.openTime ?  checkOpenClose(place.contact?.openTime, place.contact?.closeTime)   : "Không có thông tin"} </li>
+                    <li>Thời gian hoạt động: {place.contact?.openTime && place.contact?.closeTime ? checkOpenClose(place.contact?.openTime, place.contact?.closeTime)   : "Không có thông tin"} </li>
                     
                   </ul>
               </div>
@@ -319,7 +335,23 @@ export default function BodyDetail() {
                 <span className="text" style={{ textDecoration: "underline" }}>
                   {place.numberRating} đánh giá
                 </span>
-                <button style={{padding: "3px 13px"}} className="btn-show-all-comfortable">Đánh giá</button>
+                <button style={{padding: "3px 13px"}} className={jwt ? `btn-show-all-comfortable` : 'd-none'} onClick={toggleOverlayCreateReviews}>Đánh giá</button>
+                {(
+                <div className={`overlay2 ${isOverlayCreateReviews ? '' : 'd-none'}`} >
+                  <div style={{ width: '60%', height: '700px' }} className={`appearing-div ${isOverlayReviews ? 'active' : ''}`}>
+                  <div>
+                      <i onClick={toggleOverlayCreateReviews} className="fa-solid fa-xmark close-description" ></i>
+                  </div>
+                  <div className='active-reviews-container' style={{justifyContent: "center"}}>
+                    <div className='active-reviews-extra'>
+                      <div className='container-lastest-reviews'>
+                        <CreateReview placeId= {placeId} setIsOVerlayCreateReviews={setIsOVerlayCreateReviews} />
+                      </div>
+                    </div>
+                  </div>
+                  </div>
+                </div>
+              ) }
               </h3>
               <div className="container-review">
                 <div className="review-details">
@@ -329,7 +361,7 @@ export default function BodyDetail() {
                         <div className="container-details-users">
                           <img
                             className="avatar-user-review"
-                            src={review?.userDTO?.avatar.fileUrl}
+                            src={review?.userDTO?.avatar ? review?.userDTO?.avatar?.fileUrl : ('https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/17/trend-avatar-1.jpg')}
                             alt=""
                           />
                           <div>
@@ -371,7 +403,7 @@ export default function BodyDetail() {
                                     className='content-details' key={index}>
                                     <div className='container-details-users'>
                                         <img className='avatar-user-review'
-                                            src={review?.userDTO?.avatar.fileUrl} alt="" />
+                                            src={review?.userDTO?.avatar ?  review?.userDTO?.avatar?.fileUrl :  ('https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/17/trend-avatar-1.jpg')} alt="" />
                                         <div >
                                             <h3>{review?.userDTO.username}</h3>
                                             <h4>{startRating(review.rating)}</h4>

@@ -1879,8 +1879,8 @@ span:nth-last-child(3) {
     background: white;
     border: 1px solid #dedcdc;
     border-radius: 13px;
-    right: 0%;
-    top: 8.5%;
+    right: 1%;
+    top: 14.5%;
     box-shadow: 1px 3px 6px rgba(0, 0, 0, 0.4);
     z-index: 999999;
     padding: 0px 31px;
@@ -2224,4 +2224,12 @@ hr {
 .custom-div-icon{
     display: flex;
 }
+
+.btn-info {
+    border: 1px solid;
+    padding: 10px;
+    border-radius: 30px;
+    display: flex;
+}
+
 

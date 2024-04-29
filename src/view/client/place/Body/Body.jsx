@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../css/Client.css";
-import Header from "../Header";
-import PlaceList from "../PlaceList";
+import Header from "../Header/Header";
+import PlaceList from "../PlaceList/PlaceList";
 import UseFetchCategory from "../../../../hooks/client/UseFetchCategory";
 import PlaceService from "../../../../service/PlaceService";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
@@ -9,7 +9,7 @@ import L from "leaflet";
 import markerIcon from "../../../../images/marker.png";
 import { divIcon } from "leaflet";
 import ImgSlideOnMap from "../Footer/ImgSlideOnMap";
-import PlaceSlider from "../PlaceSlider";
+import PlaceSlider from "../PlaceList/PlaceSlider";
 import { usePlace } from "../../../../context/PlaceContext";
 import { IonIcon } from '@ionic/react';
 import { heartOutline, heartCircleOutline } from 'ionicons/icons';
@@ -18,7 +18,6 @@ import "rc-slider/assets/index.css";
 import Slider from "rc-slider";
 
 export default function Body() {
-  const { placeList } = usePlace();
   const [placeLocations, setPlaceLocations] = useState([]);
   const itemsPerLoad = 7;
   const categories = UseFetchCategory();
@@ -26,7 +25,6 @@ export default function Body() {
   const [currentIndexInt, setCurrentIndexInt] = useState(itemsPerLoad);
   const [comfortableSelected, setComfortableSelected] = useState(null);
   const [showSpinner, setShowSpinner] = useState(false);
-  const { setCategoryId } = usePlace();
   const [showMapList, setshowMapList] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
   const [placeLiked, setplaceLiked] = useState([]);
@@ -35,6 +33,9 @@ export default function Body() {
   const [hasClickedButtonSpinner, setHasClickedButtonSpinner] = useState(false);
   const [mapZoomed, setMapZoomed] = useState(false);
   const itemWidth = 220;
+  const { searchValue, setSearchValue, categoryId, setCategoryId , district, ward, address, rating , placeList , setPlaceList } = usePlace();
+
+
 
   const updateCategoryPosition = () => {
     const translateX = -currentIndex * itemWidth;
@@ -81,6 +82,7 @@ export default function Body() {
   };
 
   const handleShowMap = () => {
+    console.log('handleShowMap');
     setshowMapList((prevShowMap) => !prevShowMap);
     setShowBtnCurrentLocation((prevBtn) => !prevBtn);
     if (!showMapList) {
@@ -131,6 +133,7 @@ export default function Body() {
   }, []);
 
   useEffect(() => {
+    console.log('categoryId: ' + categoryId);
     if (placeList && placeList.length > 0) {
       const locations =
         placeList &&
@@ -153,6 +156,8 @@ export default function Body() {
   }, [placeList]);
 
 
+
+
   const [isOverLayOpenFormWishList, setIsOverLayOpenFormWishList] =
     useState(false);
   const [
@@ -173,14 +178,23 @@ export default function Body() {
     }
   };
 
-//   const handleFilterPlaceByComfortable = async (comfortableId) => {
-//     const res = await PlaceService.getPlaceListByCategoryAndSearch(comfortableId, " ");
-//     if (res.data.length && res.data.length > 0) {
-//         setPlaceFilterByComfortable(res.data);
-//         setPlaceSearchByCity([])
-//     }
 
-// }
+
+  useEffect(() => {
+    async function getPlaceListByCategoryAndSearch(categoryId, searchValue, district, ward, address, rating) {
+      let res = await PlaceService.getPlaceListByCategoryAndSearch(
+        categoryId,
+        searchValue,
+        district,
+        ward,
+        address,
+        rating
+      );
+      setPlaceList(res.data.content);
+    }
+    getPlaceListByCategoryAndSearch(categoryId, searchValue, district, ward, address, rating);
+
+  }, [categoryId, searchValue, district, ward, address, rating]);
 
 
 
@@ -264,8 +278,60 @@ export default function Body() {
             <i className="fa-solid fa-location-crosshairs"></i>
           </button>
         )}
-        {showMapList ? (
-          <div id="map-container" style={{ height: "500px" }}>
+
+        {/* {showMapList && (
+          <div id="map-container" style={{ height: "500px"}}>
+            <MapContainer
+              center={userLocation || [0, 0]}
+              zoom={100}
+              style={{ height: "200%", width: "100%" }}
+              ref={mapRef}
+            >
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution={`
+                                    &copy; <a href="https://www.openstreetmap.org/copyright">Điều khoản sử dụng</a>
+                                    `}
+              />
+              {placeLocations.map((location, index) => (
+                <Marker
+                  key={index}
+                  position={[location.lat, location.lng]}
+                  icon={customIcon(location.info.placeName)}
+                >
+                  <Popup>
+                    <div
+                      style={{
+                        width: "115.3%",
+                        right: "21px",
+                        position: "relative",
+                        top: "-14px",
+                        borderRadius: "5px 5px 5px 5px",
+                      }}
+                    >
+                      <div>
+                        <ImgSlideOnMap place={location.info} />
+                      </div>
+                      <div style={{ margin: "0px 20px" }}>
+                        <h2>{location.placeName}</h2>
+                      </div>
+                    </div>
+                  </Popup>
+                </Marker>
+              ))}
+              {showUserLocation && (
+                <Marker
+                  position={userLocation}
+                  icon={customIconCurrent}
+                ></Marker>
+              )}
+            </MapContainer>
+          </div>
+        )
+        } */}
+
+        {showMapList && placeLocations.length ? (
+          <div id="map-container" style={{ height: "500px"}}>
             <MapContainer
               center={userLocation || [0, 0]}
               zoom={100}

@@ -7,7 +7,7 @@ import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
-import "./css/Slider.css"
+import "../css/Slider.css"
 import { Link } from 'react-router-dom';
 
 

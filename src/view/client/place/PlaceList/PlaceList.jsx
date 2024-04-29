@@ -2,25 +2,26 @@ import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import UseFetchPlace from "../../../hooks/client/UseFetchPlace";
+import UseFetchPlace from "../../../../hooks/client/UseFetchPlace";
 import LoadingPlaceList from "./LoadingPlace";
 import PlaceSlider from "./PlaceSlider";
 import { IonIcon } from "@ionic/react";
 import { heartOutline, heartCircleOutline } from "ionicons/icons";
-import "../../../../node_modules/@fortawesome/fontawesome-free/css/all.min.css";
+import "../../../../../node_modules/@fortawesome/fontawesome-free/css/all.min.css";
 import moment from "moment";
-import checkOpenClose from "../../../utils/CheckOpenClose";
-import ShowLocation from "./Body/ShowLocation";
-import ShowNoFilterResult from "./Body/ShowNoFilterResult";
-import { usePlace } from "../../../context/PlaceContext";
-import PlaceService from "../../../service/PlaceService";
-import startRating from "../../../utils/StarRating";
-import SearchSidebar from "./SearchSideBar";
-import FavouriteService from "../../../service/FavouriteService";
+import checkOpenClose from "../../../../utils/CheckOpenClose";
+import ShowLocation from "../Body/ShowLocation";
+import ShowNoFilterResult from "../Body/ShowNoFilterResult";
+import { usePlace } from "../../../../context/PlaceContext";
+import PlaceService from "../../../../service/PlaceService";
+import startRating from "../../../../utils/StarRating";
+import SearchSidebar from "../SideBar/SearchSideBar";
+import FavouriteService from "../../../../service/FavouriteService";
 
 
 
-export default function PlaceList() {
+export default function PlaceList(props) {
+  // const handleShowMap = props.handleShowMap
   const [loading, setLoading] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [showMapStates, setShowMapStates] = useState({});
@@ -60,20 +61,22 @@ export default function PlaceList() {
 
 
 
-  useEffect(() => {
-    async function getPlaceListByCategoryAndSearch(categoryId, searchValue, district, ward, address, rating) {
-      let res = await PlaceService.getPlaceListByCategoryAndSearch(
-        categoryId,
-        searchValue,
-        district,
-        ward,
-        address,
-        rating
-      );
-      setPlaceList(res.data.content);
-    }
-    getPlaceListByCategoryAndSearch(categoryId, searchValue, district, ward, address, rating);
-  }, [categoryId, searchValue, district, ward, address, rating]);
+  // useEffect(() => {
+  //   async function getPlaceListByCategoryAndSearch(categoryId, searchValue, district, ward, address, rating) {
+  //     let res = await PlaceService.getPlaceListByCategoryAndSearch(
+  //       categoryId,
+  //       searchValue,
+  //       district,
+  //       ward,
+  //       address,
+  //       rating
+  //     );
+  //     setPlaceList(res.data.content);
+  //   }
+  //   getPlaceListByCategoryAndSearch(categoryId, searchValue, district, ward, address, rating);
+  //   // handleShowMap()
+  //   // handleShowMap()
+  // }, [categoryId, searchValue, district, ward, address, rating]);
 
   return (
     <>
@@ -105,8 +108,6 @@ export default function PlaceList() {
                   place.contact.closeTime,
                   "HH:mm:ss"
                 ).format("HH:mm");
-
-                // const isHouseLiked = houseLiked.includes(Number(house.id));
                 const isPlaceLiked = "";
                 return (
                   <div key={index} className="listing">
