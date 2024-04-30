@@ -13,6 +13,7 @@ export const PlaceProvider = ({ children }) => {
     const [ward, setWard] = useState("");
     const [address, setAddress] = useState("");
     const [placeList, setPlaceList] = useState([])
+    const [placeLiked, setPlaceLiked] = useState([]);
 
     return (
         <PlaceContext.Provider value={{ 
@@ -33,7 +34,9 @@ export const PlaceProvider = ({ children }) => {
             address, 
             setAddress,
             placeList, 
-            setPlaceList
+            setPlaceList,
+            placeLiked,
+            setPlaceLiked
              }}>
             {children}
         </PlaceContext.Provider>

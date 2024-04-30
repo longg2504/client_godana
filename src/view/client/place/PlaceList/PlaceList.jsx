@@ -17,22 +17,26 @@ import PlaceService from "../../../../service/PlaceService";
 import startRating from "../../../../utils/StarRating";
 import SearchSidebar from "../SideBar/SearchSideBar";
 import FavouriteService from "../../../../service/FavouriteService";
+import Swal from "sweetalert";
+import { useNavigate } from "react-router-dom";
 
-
-
-export default function PlaceList(props) {
-  // const handleShowMap = props.handleShowMap
-  const [loading, setLoading] = useState(false);
+export default function PlaceList(prop) {
+  const loading = prop.loading;
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [showMapStates, setShowMapStates] = useState({});
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
-  const [isOverLayOpenFormWishList, setIsOverLayOpenFormWishList] = useState(false)
-  const [isOverLayOpenFormCreatNewWishList, setIsOverLayOpenFormCreatNewWishList] = useState(false);
-  const [idHouseSelected, setIdHouseSelected] = useState(null)
-  const { searchValue, setSearchValue, categoryId, setCategoryId , district, ward, address, rating , placeList , setPlaceList } = usePlace();
+  const [isOverLayOpenFormWishList, setIsOverLayOpenFormWishList] =
+    useState(false);
+  const [
+    isOverLayOpenFormCreatNewWishList,
+    setIsOverLayOpenFormCreatNewWishList,
+  ] = useState(false);
+  const [idHouseSelected, setIdHouseSelected] = useState(null);
+  const { placeList, placeLiked, setPlaceLiked } = usePlace();
+  const id = localStorage.getItem("id");
 
-
+  const navigate = useNavigate();
 
   const toggleHover = (index) => {
     setHoveredIndex(index);
@@ -56,27 +60,75 @@ export default function PlaceList(props) {
     setIsOverlayVisible(!isOverlayVisible);
   };
 
-  
+  const getFavoriteList = async () => {
+    if (id !== null) {
+      try {
+        const resp = await FavouriteService.getFavouriteListByUser(id);
+        setPlaceLiked(resp.data);
+      } catch (err) {
+        console.error("Lỗi khi lấy danh sách yêu thích:", err);
+      }
+    } else {
+      console.error("Id user không tồn tại");
+    }
+  };
+  const [isLikeChecked, setIsLikeChecked] = useState(false);
 
+  useEffect(() => {
+    if (id && !isLikeChecked) {
+      getFavoriteList();
+      setIsLikeChecked(true);
+    }
+  }, [id]);
 
+  const createFavouriteList = (placeId, userId) => {
+    const data = {
+      placeId: placeId,
+      userId: userId,
+    };
+    if (id !== null) {
+      FavouriteService.createFavouriteList(data);
+      try {
+        toast.success("Thêm danh sách yêu thích thành công", {
+          className: "custom-toast-create-new-wish-list-success",
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      } catch (error) {
+        toast.error("Lỗi khi thêm danh sách yêu thích", {
+          className: "custom-toast-create-new-wish-list-success",
+        });
+      }
+    } else {
+      toast.error("Vui lòng đăng nhập để thêm yêu thích", {
+        className: "custom-toast-create-new-wish-list-success",
+      });
+      navigate("/login");
+    }
+  };
 
-
-  // useEffect(() => {
-  //   async function getPlaceListByCategoryAndSearch(categoryId, searchValue, district, ward, address, rating) {
-  //     let res = await PlaceService.getPlaceListByCategoryAndSearch(
-  //       categoryId,
-  //       searchValue,
-  //       district,
-  //       ward,
-  //       address,
-  //       rating
-  //     );
-  //     setPlaceList(res.data.content);
-  //   }
-  //   getPlaceListByCategoryAndSearch(categoryId, searchValue, district, ward, address, rating);
-  //   // handleShowMap()
-  //   // handleShowMap()
-  // }, [categoryId, searchValue, district, ward, address, rating]);
+  const handleRemoveFavorite = async (placeId, userId) => {
+    const data = {
+      placeId: placeId,
+      userId: userId,
+    };
+    if (id !== null) {
+      try {
+        FavouriteService.deletedFavourite(data);
+        toast.success("Đã xoá khỏi danh sách", {
+          className: "custom-toast-create-new-wish-list-success",
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      } catch (err) {
+        toast.error("Lỗi khi xóa nhà yêu thích", {
+          className: "custom-toast-create-new-wish-list-success",
+        });
+      }
+    }
+  };
 
   return (
     <>
@@ -96,10 +148,12 @@ export default function PlaceList(props) {
           <SearchSidebar />
 
           <div className="search-results">
-            {loading ? (
+            {loading == true ? (
               <LoadingPlaceList />
             ) : Array.isArray(placeList) && placeList.length > 0 ? (
               placeList?.map((place, index) => {
+                const likedPlaceIds = placeLiked.map((item) => item.place.id);
+                const isPlaceLiked = likedPlaceIds.includes(place.id);
                 const openTime = moment(
                   place.contact.openTime,
                   "HH:mm:ss"
@@ -108,7 +162,6 @@ export default function PlaceList(props) {
                   place.contact.closeTime,
                   "HH:mm:ss"
                 ).format("HH:mm");
-                const isPlaceLiked = "";
                 return (
                   <div key={index} className="listing">
                     <div>
@@ -122,9 +175,9 @@ export default function PlaceList(props) {
                               onMouseLeave={() => toggleHover(null)}
                             >
                               <i
-                                // onClick={() => {
-                                //   handleRemoveFavorite(place.id);
-                                // }}
+                                onClick={() => {
+                                  handleRemoveFavorite(place.id, id);
+                                }}
                                 className="fa-solid fa-heart"
                                 style={{ color: "#f21202" }}
                               ></i>
@@ -137,9 +190,10 @@ export default function PlaceList(props) {
                             >
                               {hoveredIndex === index ? (
                                 <IonIcon
-                                    onClick={() => {
-                                      setIdHouseSelected(place.id);
-                                    }}
+                                  onClick={() => {
+                                    createFavouriteList(place.id, id);
+                                    setIdHouseSelected(place.id);
+                                  }}
                                   icon={heartCircleOutline}
                                   className="heartCircle-icon"
                                 />
@@ -181,7 +235,7 @@ export default function PlaceList(props) {
                           <h4>
                             {startRating(place.rating ? place.rating : 0)}
                           </h4>
-                          <span style={{fontSize: "13px"}}>
+                          <span style={{ fontSize: "13px" }}>
                             {place.locationRegion?.address +
                               ", " +
                               place.locationRegion?.wardName +
@@ -202,14 +256,8 @@ export default function PlaceList(props) {
               <ShowNoFilterResult />
             )}
           </div>
-
-          
-
-
-            
         </div>
       </div>
     </>
   );
 }
-

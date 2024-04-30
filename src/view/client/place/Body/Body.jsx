@@ -18,6 +18,7 @@ import "rc-slider/assets/index.css";
 import Slider from "rc-slider";
 
 export default function Body() {
+  const [loading, setLoading] = useState(true);
   const [placeLocations, setPlaceLocations] = useState([]);
   const itemsPerLoad = 7;
   const categories = UseFetchCategory();
@@ -82,7 +83,6 @@ export default function Body() {
   };
 
   const handleShowMap = () => {
-    console.log('handleShowMap');
     setshowMapList((prevShowMap) => !prevShowMap);
     setShowBtnCurrentLocation((prevBtn) => !prevBtn);
     if (!showMapList) {
@@ -191,6 +191,7 @@ export default function Body() {
         rating
       );
       setPlaceList(res.data.content);
+      setLoading(false);
     }
     getPlaceListByCategoryAndSearch(categoryId, searchValue, district, ward, address, rating);
 
@@ -279,56 +280,7 @@ export default function Body() {
           </button>
         )}
 
-        {/* {showMapList && (
-          <div id="map-container" style={{ height: "500px"}}>
-            <MapContainer
-              center={userLocation || [0, 0]}
-              zoom={100}
-              style={{ height: "200%", width: "100%" }}
-              ref={mapRef}
-            >
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution={`
-                                    &copy; <a href="https://www.openstreetmap.org/copyright">Điều khoản sử dụng</a>
-                                    `}
-              />
-              {placeLocations.map((location, index) => (
-                <Marker
-                  key={index}
-                  position={[location.lat, location.lng]}
-                  icon={customIcon(location.info.placeName)}
-                >
-                  <Popup>
-                    <div
-                      style={{
-                        width: "115.3%",
-                        right: "21px",
-                        position: "relative",
-                        top: "-14px",
-                        borderRadius: "5px 5px 5px 5px",
-                      }}
-                    >
-                      <div>
-                        <ImgSlideOnMap place={location.info} />
-                      </div>
-                      <div style={{ margin: "0px 20px" }}>
-                        <h2>{location.placeName}</h2>
-                      </div>
-                    </div>
-                  </Popup>
-                </Marker>
-              ))}
-              {showUserLocation && (
-                <Marker
-                  position={userLocation}
-                  icon={customIconCurrent}
-                ></Marker>
-              )}
-            </MapContainer>
-          </div>
-        )
-        } */}
+       
 
         {showMapList && placeLocations.length ? (
           <div id="map-container" style={{ height: "500px"}}>
@@ -378,7 +330,7 @@ export default function Body() {
               )}
             </MapContainer>
           </div>
-        )  : <PlaceList/>
+        )  : <PlaceList loading={loading}/>
         }
       </>
     </div>

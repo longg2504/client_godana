@@ -184,12 +184,18 @@ export default function BodyDetail() {
           {place.placeAvatar && (
             <div className="image-house-detail">
               <div className="img0">
-                <img src={place.placeAvatar[0].fileUrl} />
+                <img src={ place.placeAvatar[0]
+                      ? place.placeAvatar[0].fileUrl
+                      : imgError} />
               </div>
               <div className="imgs">
-                <img src={place.placeAvatar[1].fileUrl} />
+                <img src={ place.placeAvatar[1]
+                      ? place.placeAvatar[1].fileUrl
+                      : imgError} />
                 <img
-                  src={place.placeAvatar[2].fileUrl}
+                  src={ place.placeAvatar[2]
+                    ? place.placeAvatar[2].fileUrl
+                    : imgError}
                   style={{ borderRadius: "0px 30px 0px 0px" }}
                 />
                 <img

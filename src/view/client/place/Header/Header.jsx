@@ -4,6 +4,7 @@ import "../css/Client.css";
 import logo from "../../../../images/logoGoDana.png";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { usePlace } from "../../../../context/PlaceContext";
+import FavouriteService from "../../../../service/FavouriteService";
 
 
 function Header() {
@@ -11,7 +12,8 @@ function Header() {
   const jwtValue = localStorage.getItem("jwt");
   const username = localStorage.getItem("username");
   const avatar = localStorage.getItem("avatar");
-
+  const id = localStorage.getItem('id')
+  const {placeLiked,setPlaceLiked, setPlaceList} = usePlace();
   const navigate = useNavigate();
 
 
@@ -34,9 +36,25 @@ function Header() {
     localStorage.removeItem('id');
     localStorage.removeItem('email')
     localStorage.removeItem('roles')
-    navigate('/login', { replace: true });
+    navigate('/', { replace: true });
     window.location.reload();
   }
+
+  const  getFavoriteList = async () => {
+    if (id !== null) {
+        try {
+            const resp = await FavouriteService.getFavouriteListByUser(id)
+            setPlaceLiked(resp.data);
+            const likedPlaceIds = placeLiked.map((item) => item.place);
+            setPlaceList(likedPlaceIds);
+            setIsOpenDropMenuLoginWithJWT(false)
+        } catch (err) {
+            console.error('Lỗi khi lấy danh sách yêu thích:', err);
+        }
+    } else {
+        console.error('Id user không tồn tại');
+    }
+}
 
 
   console.log(searchValue);
@@ -88,7 +106,7 @@ function Header() {
 {
             isOpenDropMenuLoginWithJWT && (
               <div className="dropdown-menu-login">
-                <Link className="link-user-login">
+                <Link className="link-user-login" onClick={getFavoriteList} >
                   <div className="dropdown-menu-choice">Danh sách yêu thích</div>
                 </Link>
                 <hr /> 
