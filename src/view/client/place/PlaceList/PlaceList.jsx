@@ -152,7 +152,7 @@ export default function PlaceList(prop) {
               <LoadingPlaceList />
             ) : Array.isArray(placeList) && placeList.length > 0 ? (
               placeList?.map((place, index) => {
-                const likedPlaceIds = placeLiked.map((item) => item.place.id);
+                const likedPlaceIds = Array.isArray(placeLiked) ? placeLiked.map(item => item.place.id) : [];
                 const isPlaceLiked = likedPlaceIds.includes(place.id);
                 const openTime = moment(
                   place.contact.openTime,

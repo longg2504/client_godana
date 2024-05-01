@@ -133,7 +133,6 @@ export default function Body() {
   }, []);
 
   useEffect(() => {
-    console.log('categoryId: ' + categoryId);
     if (placeList && placeList.length > 0) {
       const locations =
         placeList &&
