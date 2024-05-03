@@ -3,6 +3,7 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
 const LocationDetail = ({ latitude, longitude }) => {
+
   const mapRef = useRef(null);
 
   var greenIcon = L.icon({

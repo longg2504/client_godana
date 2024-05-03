@@ -781,3 +781,43 @@
 .user-reivew{
     margin-bottom: 60px;
 }
+
+.search-results-detail{
+    display: flex;
+    width: 100%;
+    overflow: hidden;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.search-results-detail {
+    position: relative; /* Đảm bảo container là relative để absolute của nút có thể hoạt động */
+}
+
+.button-nav {
+    position: absolute;
+    top: 50%; /* Đặt nút ở giữa chiều cao của container */
+    transform: translateY(-50%); /* Điều chỉnh nút để chính xác ở giữa chiều cao */
+    z-index: 100; /* Đảm bảo nút nằm trên các elements khác */
+    background-color: white; /* Màu nền cho nút, có thể điều chỉnh */
+    border-radius: 50%; /* Làm tròn nút */
+    width: 40px; /* Chiều rộng của nút */
+    height: 40px; /* Chiều cao của nút */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none; /* Bỏ viền nếu có */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Thêm bóng nếu cần */
+}
+
+.button-nav.left {
+    left: 0;
+    top: 250px;
+}
+
+.button-nav.right {
+    right: 0;
+    top: 250px;
+}
+
+

@@ -92,9 +92,8 @@ export default function PlaceList(prop) {
         toast.success("Thêm danh sách yêu thích thành công", {
           className: "custom-toast-create-new-wish-list-success",
         });
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
+
+          setPlaceLiked([...placeLiked, {place: {id: placeId}}]) 
       } catch (error) {
         toast.error("Lỗi khi thêm danh sách yêu thích", {
           className: "custom-toast-create-new-wish-list-success",
@@ -119,9 +118,7 @@ export default function PlaceList(prop) {
         toast.success("Đã xoá khỏi danh sách", {
           className: "custom-toast-create-new-wish-list-success",
         });
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
+        setPlaceLiked(placeLiked.filter(e => e.place.id != placeId))
       } catch (err) {
         toast.error("Lỗi khi xóa nhà yêu thích", {
           className: "custom-toast-create-new-wish-list-success",
@@ -129,7 +126,9 @@ export default function PlaceList(prop) {
       }
     }
   };
-
+  useEffect(() => {
+    console.log(placeLiked);
+  }, [placeLiked])
   return (
     <>
       <div>
@@ -154,14 +153,7 @@ export default function PlaceList(prop) {
               placeList?.map((place, index) => {
                 const likedPlaceIds = Array.isArray(placeLiked) ? placeLiked.map(item => item.place.id) : [];
                 const isPlaceLiked = likedPlaceIds.includes(place.id);
-                const openTime = moment(
-                  place.contact.openTime,
-                  "HH:mm:ss"
-                ).format("HH:mm");
-                const closeTime = moment(
-                  place.contact.closeTime,
-                  "HH:mm:ss"
-                ).format("HH:mm");
+
                 return (
                   <div key={index} className="listing">
                     <div>
@@ -246,7 +238,7 @@ export default function PlaceList(prop) {
                               ", "}
                           </span>
                         </div>
-                        <span>{checkOpenClose(openTime, closeTime)}</span>
+                        <span>{checkOpenClose(place.contact.openTime, place.contact.closeTime)}</span>
                       </div>
                     </div>
                   </div>

@@ -12,6 +12,10 @@ class PlaceService  {
         return axios.get(API_URL_PLACE + `/${placeId}`)
     }
 
+    static async getAllNerbyPlace(placeId) {
+        return await axios.post(API_URL_PLACE + `/nearby_place/${placeId}`)
+    }
+
 }   
 
 export default PlaceService;

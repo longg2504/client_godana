@@ -15,6 +15,8 @@ import startRating from '../../../../utils/StarRating';
 import splitTime from "../../../../utils/SplitTime";
 import checkOpenClose from "../../../../utils/CheckOpenClose";
 import CreateReview from "./CreateReview";
+import NerbyPlace from './NerbyPlace';
+import { usePlace } from "../../../../context/PlaceContext";
 
 export default function BodyDetail() {
   const [place, setPlace] = useState({});
@@ -25,6 +27,9 @@ export default function BodyDetail() {
   const [isOverLayImages, setIsOverLayImages] = useState(false);
   const [isOverLayImagesSlider, setIsOverLayImagesSlider] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const {placeNerby, setPlaceNerby} = usePlace();
+  const [longitude, setLongitude] = useState("");
+  const [latitude, setLatitude] = useState("");
 
 
   const jwt = localStorage.getItem('jwt')
@@ -34,9 +39,11 @@ export default function BodyDetail() {
     async function getPlaceDetail() {
       let res = await PlaceService.getPlaceDetailById(placeId);
       setPlace(res.data);
+      setLongitude(res.data.longitude);
+      setLatitude(res.data.latitude);
     }
     getPlaceDetail();
-  }, []);
+  }, [placeId,longitude, latitude]);
 
 
   useEffect(() => {
@@ -45,7 +52,19 @@ export default function BodyDetail() {
       setPlaceReviews(res.data);
     }
     getReviewsPlace();
-  }, []);
+  }, [placeId]);
+
+  useEffect(()=> {
+    async function getAllNerbyPlace(){
+      const res = await PlaceService.getAllNerbyPlace(placeId);
+      setPlaceNerby(res.data);
+    }
+    getAllNerbyPlace();
+
+  },[placeId])
+
+  console.log(longitude, "longitude");
+  console.log(latitude, "latitude")
 
   const sixLastestReviews =
     placeReivew?.length >= 6
@@ -435,16 +454,24 @@ export default function BodyDetail() {
           <div style={{ width: "1200px" }}>
             <div className="title"> 
               <h2>Nơi bạn sẽ đến</h2>
-              {place?.longitude && (
+              {longitude && latitude &&(
                 <LocationDetail
-                  latitude={place.latitude}
-                  longitude={place.longitude}
+                  latitude={latitude}
+                  longitude={longitude}
                 />
               )}
-              <button className="btn-show-description" onClick={toggleOverlay}>
-            </button>
             </div>
           </div>
+          {placeNerby ? 
+            <div style={{width: "1200px", marginTop: "20px"}}>
+            <div className="title">
+              <h2>Những địa điểm trong bán kính 2km</h2>
+              <NerbyPlace/>
+            </div>
+          </div>
+          : " "
+          }
+          
         </div>
       </div>
     </>

@@ -36,6 +36,7 @@ function Header() {
     localStorage.removeItem("id");
     localStorage.removeItem("email");
     localStorage.removeItem("roles");
+    window.location.reload();
     navigate("/", { replace: true });
   };
 
@@ -64,7 +65,6 @@ function Header() {
     }
   };
 
-  console.log(searchValue);
   return (
     <>
       <div className="header">
