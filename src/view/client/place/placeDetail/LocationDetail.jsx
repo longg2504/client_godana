@@ -1,9 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
 const LocationDetail = ({ latitude, longitude }) => {
-
+  console.log(latitude,longitude , "latitude" , 'longitude')
   const mapRef = useRef(null);
 
   var greenIcon = L.icon({
@@ -18,7 +18,12 @@ const LocationDetail = ({ latitude, longitude }) => {
 });
 
   useEffect(() => {
-    if (!mapRef.current) {
+      console.log("day ne")
+      var container = L.DomUtil.get("map");
+
+    if (container != null) {
+    container._leaflet_id = null;
+    }
       mapRef.current = L.map('map').setView([latitude, longitude], 500);
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -26,8 +31,10 @@ const LocationDetail = ({ latitude, longitude }) => {
       }).addTo(mapRef.current);
 
       L.marker([latitude, longitude], { icon: L.divIcon({ className: 'custom-marker' }) }).addTo(mapRef.current);
-    }
-  }, [latitude, longitude]);
+    
+  }, [longitude, latitude]); 
+
+  
 
   return (
     <div id="map" style={{ height: '700px', width:'93%' }}></div>

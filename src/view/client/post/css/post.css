@@ -1,0 +1,31 @@
+.btn-action {
+    color: #6c757d;
+    text-decoration: none;
+}
+
+
+.btn-action:hover {
+    color: #1877f2 !important; 
+}
+
+.btn-action.liked {
+    color: #1877f2; 
+}
+
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .popup {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+  }

@@ -7,29 +7,27 @@ import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
-import "../css/Slider.css"
+import "../place/css/Slider.css";
 import { Link } from 'react-router-dom';
-
 
 const VirtualizeSwipeableViews = virtualize(AutoPlaySwipeableViews);
 
-export default function PlaceNerbySlider({ place }) {
+export default function PostSlider({ post }) {
     const theme = useTheme();
-    const maxSteps = place ? place?.placeAvatar.length ? place?.placeAvatar.length > 7 ? 7 : place?.placeAvatar.length : place?.placeAvatar.length : place?.placeAvatar.length;
+    
+    // Kiểm tra số lượng ảnh trong post.postAvatar
+    const maxSteps = post?.postAvatar?.length > 0 ? (post?.postAvatar.length > 7 ? 7 : post?.postAvatar.length) : 0;
+
     const [activeStep, setActiveStep] = useState(0);
     const [buttonOpacity, setButtonOpacity] = useState(0);
 
-
-    const huy = activeStep;
     const handleNext = () => {
         setActiveStep((prevActiveStep) => (prevActiveStep + 1) % maxSteps);
-
     };
 
     const handleBack = () => {
         setActiveStep((prevActiveStep) => (prevActiveStep - 1 + maxSteps) % maxSteps);
     };
-
 
     const handleMouseLeave = () => {
         if (buttonOpacity === 1) {
@@ -37,24 +35,28 @@ export default function PlaceNerbySlider({ place }) {
         }
     };
 
+    // Nếu không có ảnh trong post.postAvatar, không hiển thị slider
+    if (maxSteps === 0) {
+        return null;
+    }
+
     return (
-        <Box sx={{ maxWidth: 400, flexGrow: 1 }}>
+        <Box sx={{ maxWidth: 550, flexGrow: 1 }}>
             <VirtualizeSwipeableViews
                 index={activeStep}
                 onChangeIndex={setActiveStep}
                 enableMouseEvents
                 slideRenderer={({ index }) => (
                     <div key={index} className="custom-image-container">
-                        <Link to={`/place/${place.id}`} onClick={() =>window.scroll(0, 0)}>
-                            <img className='img'
+                        <Link>
+                            <img
+                                className='img'
                                 onMouseEnter={() => setButtonOpacity(1)}
                                 onMouseLeave={() => setButtonOpacity(0)}
-                                src={place.placeAvatar[huy].fileUrl}
-                                alt={`Image ${index + 1}`}
+                                src={post.postAvatar[activeStep] ? post.postAvatar[activeStep].fileUrl : ""}
                                 style={{
                                     width: '96%',
-                                    height: '210px',
-                                    
+                                    height: '250px',
                                 }}
                             />
                         </Link>
@@ -73,30 +75,26 @@ export default function PlaceNerbySlider({ place }) {
                         className="stepper-button"
                         size="small"
                         onClick={handleNext}
-                        // disabled={activeStep === maxSteps - 1}
-                        style={{ opacity: buttonOpacity }}
+                        style={{ opacity: buttonOpacity , top:"150px"}}
                         onMouseOut={() => setButtonOpacity(1)}
                         onMouseLeave={handleMouseLeave}
                     >
-
                         {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
                     </Button>
                 }
                 backButton={
-                    <Button className="stepper-button"
+                    <Button
+                        className="stepper-button"
                         onMouseOut={() => setButtonOpacity(1)}
                         onMouseLeave={handleMouseLeave}
-                        style={{ opacity: buttonOpacity }}
-                        size="small" onClick={handleBack}
-                    // disabled={activeStep === 0}>
+                        style={{ opacity: buttonOpacity , top:"150px"}}
+                        size="small"
+                        onClick={handleBack}
                     >
-
                         {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
-
                     </Button>
                 }
             />
         </Box>
     );
 }
-

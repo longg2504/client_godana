@@ -11,11 +11,12 @@ import { divIcon } from "leaflet";
 import ImgSlideOnMap from "../Footer/ImgSlideOnMap";
 import PlaceSlider from "../PlaceList/PlaceSlider";
 import { usePlace } from "../../../../context/PlaceContext";
-import { IonIcon } from '@ionic/react';
-import { heartOutline, heartCircleOutline } from 'ionicons/icons';
+import { IonIcon } from "@ionic/react";
+import { heartOutline, heartCircleOutline } from "ionicons/icons";
 import Pagination from "./Pagination";
 import "rc-slider/assets/index.css";
 import Slider from "rc-slider";
+import { Link } from "react-router-dom";
 
 export default function Body() {
   const [loading, setLoading] = useState(true);
@@ -34,9 +35,18 @@ export default function Body() {
   const [hasClickedButtonSpinner, setHasClickedButtonSpinner] = useState(false);
   const [mapZoomed, setMapZoomed] = useState(false);
   const itemWidth = 220;
-  const { searchValue, setSearchValue, categoryId, setCategoryId , district, ward, address, rating , placeList , setPlaceList } = usePlace();
-
-
+  const {
+    searchValue,
+    setSearchValue,
+    categoryId,
+    setCategoryId,
+    district,
+    ward,
+    address,
+    rating,
+    placeList,
+    setPlaceList,
+  } = usePlace();
 
   const updateCategoryPosition = () => {
     const translateX = -currentIndex * itemWidth;
@@ -109,17 +119,14 @@ export default function Body() {
   const customIcon = (title) => {
     return divIcon({
       className: "test",
-      html: 
-      `
+      html: `
       <div class="custom-div-icon">
       <img src='${markerIcon}' width='20px' height='20px' alt='Location Marker'/>
       <div class='custom-div-icon-leaflet'>${title}</div>
       </div>
       `,
-
     });
   };
-
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -154,9 +161,6 @@ export default function Body() {
     }
   }, [placeList]);
 
-
-
-
   const [isOverLayOpenFormWishList, setIsOverLayOpenFormWishList] =
     useState(false);
   const [
@@ -177,10 +181,15 @@ export default function Body() {
     }
   };
 
-
-
   useEffect(() => {
-    async function getPlaceListByCategoryAndSearch(categoryId, searchValue, district, ward, address, rating) {
+    async function getPlaceListByCategoryAndSearch(
+      categoryId,
+      searchValue,
+      district,
+      ward,
+      address,
+      rating
+    ) {
       let res = await PlaceService.getPlaceListByCategoryAndSearch(
         categoryId,
         searchValue,
@@ -192,41 +201,44 @@ export default function Body() {
       setPlaceList(res.data.content);
       setLoading(false);
     }
-    getPlaceListByCategoryAndSearch(categoryId, searchValue, district, ward, address, rating);
-
+    getPlaceListByCategoryAndSearch(
+      categoryId,
+      searchValue,
+      district,
+      ward,
+      address,
+      rating
+    );
   }, [categoryId, searchValue, district, ward, address, rating]);
 
-
-
-  
   return (
     <div>
       <>
+        
         <div className="category-container">
           <div className="category-container">
             <button className="arrow left-arrow" onClick={handleLeftArrowClick}>
               <i className="fa-solid fa-circle-chevron-left"></i>
             </button>
             <div className="category" style={updateCategoryPosition()}>
-            <div
-                  onClick={() => {
-                    setCategoryId("");
-                    handleSelectedComfotable(-1);
-                  }}
-                  className={`category-item ${
-                    comfortableSelected === -1
-                      ? "category-item-selected-comfortable"
-                      : ""
-                  }`}
-                >
-                  <i
-
-                    className="fas fa-globe"
-                    alt="Tất cả"
-                    style={{ width: "30px", height: "30px" }}
-                  />
-                  <p>Tất cả</p>
-                </div>
+              <div
+                onClick={() => {
+                  setCategoryId("");
+                  handleSelectedComfotable(-1);
+                }}
+                className={`category-item ${
+                  comfortableSelected === -1
+                    ? "category-item-selected-comfortable"
+                    : ""
+                }`}
+              >
+                <i
+                  className="fas fa-globe"
+                  alt="Tất cả"
+                  style={{ width: "30px", height: "30px" }}
+                />
+                <p>Tất cả</p>
+              </div>
               {categories.map((item, index) => (
                 <div
                   key={item.id}
@@ -279,10 +291,8 @@ export default function Body() {
           </button>
         )}
 
-       
-
         {showMapList && placeLocations.length ? (
-          <div id="map-container" style={{ height: "500px"}}>
+          <div id="map-container" style={{ height: "500px" }}>
             <MapContainer
               center={userLocation || [0, 0]}
               zoom={100}
@@ -329,8 +339,9 @@ export default function Body() {
               )}
             </MapContainer>
           </div>
-        )  : <PlaceList loading={loading}/>
-        }
+        ) : (
+          <PlaceList loading={loading} />
+        )}
       </>
     </div>
   );

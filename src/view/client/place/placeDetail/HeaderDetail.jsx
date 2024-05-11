@@ -4,18 +4,16 @@ import "../css/Client.css";
 import logo from "../../../../images/logoGoDana.png";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { usePlace } from "../../../../context/PlaceContext";
-import FavouriteService from "../../../../service/FavouriteService";
-import { ToastContainer, toast } from "react-toastify";
 
 
-function Header() {
-  const { searchValue, setSearchValue } = usePlace();
+
+function HeaderDetail(prop) {
   const jwtValue = localStorage.getItem("jwt");
   const username = localStorage.getItem("username");
   const avatar = localStorage.getItem("avatar");
   const id = localStorage.getItem("id");
-  const { placeLiked, setPlaceLiked, setPlaceList } = usePlace();
   const navigate = useNavigate();
+  const placeName = prop.placeName
 
   const [isOpenDropMenuLogin, setIsOpenDropMenuLogin] = useState(false);
   const [isOpenDropMenuLoginWithJWT, setIsOpenDropMenuLoginWithJWT] =
@@ -37,34 +35,11 @@ function Header() {
     localStorage.removeItem("email");
     localStorage.removeItem("roles");
     localStorage.removeItem('name')
+
     window.location.reload();
     navigate("/", { replace: true });
   };
 
-  const getFavoriteList = async () => {
-    if (id !== null) {
-      try {
-        const resp = await FavouriteService.getFavouriteListByUser(id);
-        if(resp.status === 204) {
-          toast.error("Tài khoản hiện tại không có danh sách yêu thích nào", {
-            className: "custom-toast-create-new-wish-list-success",
-          });
-          setIsOpenDropMenuLoginWithJWT(false);
-        }
-        else{
-          setPlaceLiked(resp.data);
-          const likedPlaceIds = placeLiked.map((item) => item.place);
-          setPlaceList(likedPlaceIds);
-          setIsOpenDropMenuLoginWithJWT(false);
-        }
-        
-      } catch (err) {
-        console.error("Lỗi khi lấy danh sách yêu thích:", err);
-      }
-    } else {
-      console.error("Id user không tồn tại");
-    }
-  };
 
   return (
     <>
@@ -80,28 +55,14 @@ function Header() {
         </Link>
 
         <div className="d-flex align-items-center justify-content-center">
-          <Link className="a-tag-footer-div-form-user" style={{marginRight: "50px"}} to={"/"}>
-            <h4>Trang chủ</h4>
+          <Link className="a-tag-footer-div-form-user" to={"/"}>
+            <h4>Trang chủ  &nbsp;</h4>
           </Link>
-          <Link
-            className="a-tag-footer-div-form-user"
-            to={"/post"}
-          >
-            <h4>Bài viết</h4>
-          </Link>
+          <i className="fa-solid fa-angle-right"></i>
+            <h4>&nbsp; {placeName}</h4>
         </div>
         
-        <div className="search-box">
-          <input
-            className="search-input"
-            type="text"
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-          />
-          <button className="search-button" type="submit">
-            <i className="fa-solid fa-magnifying-glass" />
-          </button>
-        </div>
+       
 
         <div className="header-2">
           {jwtValue && jwtValue ? (
@@ -148,14 +109,9 @@ function Header() {
 
           {isOpenDropMenuLoginWithJWT && (
             <div className="dropdown-menu-login">
-              <Link className="link-user-login" onClick={getFavoriteList}>
-                <div className="dropdown-menu-choice">Danh sách yêu thích</div>
-              </Link>
-              <hr />
               <Link className="link-user-login" to={"/user/account-setting"}>
                 <div className="dropdown-menu-choice">Tài khoản</div>
               </Link>
-              <hr />
               <div onClick={handleLogOut} className="dropdown-menu-choice">
                 Đăng xuất
               </div>
@@ -177,4 +133,4 @@ function Header() {
   );
 }
 
-export default Header;
+export default HeaderDetail;

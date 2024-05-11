@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
-import "../../../../../node_modules/@fortawesome/fontawesome-free/css/all.min.css";
-import "../css/Client.css";
-import logo from "../../../../images/logoGoDana.png";
+import "../../../../node_modules/@fortawesome/fontawesome-free/css/all.min.css"
+import '../place/css/Client.css'
+import logo from "../../../images/logoGoDana.png";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { usePlace } from "../../../../context/PlaceContext";
-import FavouriteService from "../../../../service/FavouriteService";
+import FavouriteService from "../../../service/FavouriteService";
 import { ToastContainer, toast } from "react-toastify";
+import { usePlace } from '../../../context/PlaceContext';
 
 
-function Header() {
+function HeaderPost() {
   const { searchValue, setSearchValue } = usePlace();
   const jwtValue = localStorage.getItem("jwt");
   const username = localStorage.getItem("username");
@@ -85,23 +85,13 @@ function Header() {
           </Link>
           <Link
             className="a-tag-footer-div-form-user"
-            to={"/post"}
+            to={"/user/account-setting"}
           >
             <h4>Bài viết</h4>
           </Link>
         </div>
         
-        <div className="search-box">
-          <input
-            className="search-input"
-            type="text"
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-          />
-          <button className="search-button" type="submit">
-            <i className="fa-solid fa-magnifying-glass" />
-          </button>
-        </div>
+       
 
         <div className="header-2">
           {jwtValue && jwtValue ? (
@@ -177,4 +167,4 @@ function Header() {
   );
 }
 
-export default Header;
+export default HeaderPost;

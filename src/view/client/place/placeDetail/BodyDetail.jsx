@@ -18,7 +18,7 @@ import CreateReview from "./CreateReview";
 import NerbyPlace from './NerbyPlace';
 import { usePlace } from "../../../../context/PlaceContext";
 
-export default function BodyDetail() {
+export default function BodyDetail({setPlaceName}) {
   const [place, setPlace] = useState({});
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
   const [placeReivew, setPlaceReviews] = useState([]);
@@ -41,6 +41,8 @@ export default function BodyDetail() {
       setPlace(res.data);
       setLongitude(res.data.longitude);
       setLatitude(res.data.latitude);
+      setPlaceName(res.data.placeTitle)
+
     }
     getPlaceDetail();
   }, [placeId,longitude, latitude]);
