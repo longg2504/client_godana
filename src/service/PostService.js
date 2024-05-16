@@ -6,8 +6,8 @@ class PostService  {
         return await axios.get(API_URL_POST + `?category=${categoryId}`)
     }
 
-    static async getPostById(postId){
-        return await axios.get(API_URL_POST+ `/${postId}`)
+    static  getPostById(postId){
+        return  axios.get(API_URL_POST+ `/${postId}`)
     }
 
     static async createPost(data){

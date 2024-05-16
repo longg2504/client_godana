@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Container, Row, Card, Button, Form, Modal } from "react-bootstrap";
 import { FaPlus, FaTrash } from "react-icons/fa";
-import Swal from 'sweetalert';
+import Swal from "sweetalert";
 import PostService from "../../../service/PostService";
 import userImage from "../../../images/user.png";
 import UseFetchCategory from "../../../hooks/client/UseFetchCategory";
@@ -15,11 +15,12 @@ export default function PostCreation({ refreshPosts }) {
   const [selectedCategory, setSelectedCategory] = useState(""); // Trạng thái lưu danh mục đã chọn
   const jwt = localStorage.getItem("jwt");
   const userId = localStorage.getItem("id");
-  const avatar = localStorage.getItem('avatar');
-  const name = localStorage.getItem('name');
-  const nameParts = name.split(' ');
+  const avatar = localStorage.getItem("avatar");
+  const name = localStorage.getItem("name");
+  const nameParts = name.split(" ");
   const lastName = nameParts[nameParts.length - 1];
   const categories = UseFetchCategory(); // Lấy danh sách danh mục từ hook
+  const [isSaveLoading, setIsSaveLoading] = useState(false);
 
   // Xử lý thay đổi nội dung bài viết
   const handlePostContentChange = (e) => {
@@ -45,14 +46,14 @@ export default function PostCreation({ refreshPosts }) {
     setImages(newImages);
 
     // Tạo URL tạm cho mỗi ảnh đã chọn
-    const newImagePreviews = newImages.map(file => URL.createObjectURL(file));
+    const newImagePreviews = newImages.map((file) => URL.createObjectURL(file));
     setImagePreviews(newImagePreviews);
   };
 
   // Xử lý khi gửi bài viết
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setIsSaveLoading(true);
     if (!jwt) {
       Swal({
         title: "Thông báo!",
@@ -92,6 +93,8 @@ export default function PostCreation({ refreshPosts }) {
       }
     } catch (error) {
       console.error("Lỗi khi tạo bài viết:", error);
+    }finally{
+      setIsSaveLoading(false); 
     }
   };
 
@@ -152,7 +155,6 @@ export default function PostCreation({ refreshPosts }) {
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit}>
-            
             {/* Trường nhập tiêu đề */}
             <Form.Control
               type="text"
@@ -174,9 +176,12 @@ export default function PostCreation({ refreshPosts }) {
             {/* Thêm trường chọn danh mục */}
             <Form.Group controlId="formCategory" className="mb-2">
               <Form.Label>Danh mục:</Form.Label>
-              <Form.Select value={selectedCategory} onChange={handleCategoryChange}>
+              <Form.Select
+                value={selectedCategory}
+                onChange={handleCategoryChange}
+              >
                 <option value="">Chọn danh mục</option>
-                {categories.map(category => (
+                {categories.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.title}
                   </option>
@@ -197,16 +202,25 @@ export default function PostCreation({ refreshPosts }) {
                   style={{ display: "none" }}
                 />
               </div>
-              <Button type="submit" variant="primary">
-                Đăng bài viết
-              </Button>
             </div>
 
             {/* Hiển thị ảnh đã chọn */}
             <div>
               {imagePreviews.map((src, index) => (
-                <div key={index} style={{ position: "relative", display: "inline-block", marginRight: "10px" }}>
-                  <img key={index} src={src} alt={`Preview ${index}`} style={{ width: '100px', height: '100px' }} />
+                <div
+                  key={index}
+                  style={{
+                    position: "relative",
+                    display: "inline-block",
+                    marginRight: "10px",
+                  }}
+                >
+                  <img
+                    key={index}
+                    src={src}
+                    alt={`Preview ${index}`}
+                    style={{ width: "100px", height: "100px" }}
+                  />
                   {/* Nút xóa ảnh */}
                   <Button
                     variant="danger"
@@ -219,6 +233,25 @@ export default function PostCreation({ refreshPosts }) {
                 </div>
               ))}
             </div>
+            {isSaveLoading ? (
+              <div className="loadingio-spinner-ellipsis-ilx1jirdsl" style={{ marginLeft: "170px", marginTop: "20px" }}>
+                <div className="ldio-qk6putkpoq">
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                </div>
+              </div>
+            ) : (
+              <Button
+                type="submit"
+                variant="primary"
+                style={{ marginLeft: "170px", marginTop: "20px" }}
+              >
+                Đăng bài viết
+              </Button>
+            )}
           </Form>
         </Modal.Body>
       </Modal>

@@ -20,6 +20,7 @@ const HeaderFormUser = () => {
         localStorage.removeItem("id");
         localStorage.removeItem("email");
         localStorage.removeItem("roles");
+        localStorage.removeItem("name");
         navigate("/", { replace: true });
         window.location.reload();
       };
@@ -37,6 +38,18 @@ const HeaderFormUser = () => {
         <Link to={"/"}>
             <img className="img-header" ref={imgRef} src={logo} alt="" />
         </Link>
+
+        <div className="d-flex align-items-center justify-content-center">
+          <Link className="a-tag-footer-div-form-user" style={{marginRight: "50px"}} to={"/"}>
+            <h4>Trang chủ</h4>
+          </Link>
+          <Link
+            className="a-tag-footer-div-form-user"
+            to={"/post"}
+          >
+            <h4>Bài viết</h4>
+          </Link>
+        </div>
 
         <div className="header-2">
           {jwtValue && jwtValue ? (

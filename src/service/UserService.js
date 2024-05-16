@@ -15,6 +15,11 @@ class UserService {
             }
         });
     }
+
+    static async changePassword(userId, data){
+        return await axios.post(API_URL_USER + `/change-password/${userId}` , data)
+    } 
+    
 }
 
 export default UserService;

@@ -85,7 +85,7 @@ function HeaderPost() {
           </Link>
           <Link
             className="a-tag-footer-div-form-user"
-            to={"/user/account-setting"}
+            to={"/post"}
           >
             <h4>Bài viết</h4>
           </Link>
@@ -157,8 +157,10 @@ function HeaderPost() {
               <Link to={`/login`} className="link-user-login">
                 <div className="dropdown-menu-choice">Đăng nhập</div>
               </Link>
-
+              
+              <Link to={`/signup`} className="link-user-login">
               <div className="dropdown-menu-choice">Đăng ký</div>
+              </Link>
             </div>
           )}
         </div>

@@ -10,19 +10,24 @@ const PostUpdate = ({ post, refreshPosts, onClose }) => {
   const [selectedCategory, setSelectedCategory] = useState(
     post ? post.category.id : ""
   );
-  const [currentImageIds, setCurrentImageIds] = useState(post ? post.postAvatar.map(img => img.id) : []);
+  const [currentImageIds, setCurrentImageIds] = useState(
+    post ? post.postAvatar.map((img) => img.id) : []
+  );
   const [images, setImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
   const categories = UseFetchCategory();
+  const [isSaveLoading, setIsSaveLoading] = useState(false);
 
   useEffect(() => {
     if (post) {
       setTitle(post.title);
       setContent(post.content);
       setSelectedCategory(post.category.id);
-      const existingImagePreviews = post.postAvatar ? post.postAvatar.map(img => img.fileUrl) : [];
+      const existingImagePreviews = post.postAvatar
+        ? post.postAvatar.map((img) => img.fileUrl)
+        : [];
       setImagePreviews(existingImagePreviews);
-      setCurrentImageIds(post.postAvatar.map(img => img.id));
+      setCurrentImageIds(post.postAvatar.map((img) => img.id));
     }
   }, [post]);
 
@@ -40,7 +45,7 @@ const PostUpdate = ({ post, refreshPosts, onClose }) => {
 
   const handleImagesChange = (e) => {
     const newFiles = Array.from(e.target.files);
-    const newPreviews = newFiles.map(file => URL.createObjectURL(file));
+    const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
     setImages([...images, ...newFiles]); // Append new images to the existing list
     setImagePreviews([...imagePreviews, ...newPreviews]); // Append new image previews
   };
@@ -55,15 +60,19 @@ const PostUpdate = ({ post, refreshPosts, onClose }) => {
 
   const handleUpdateSubmit = async (e) => {
     e.preventDefault();
+    setIsSaveLoading(true);
+
     const formData = new FormData();
     formData.append("postTitle", title);
     formData.append("content", content);
     formData.append("categoryId", selectedCategory);
-    currentImageIds.forEach(id => formData.append("listIdAvatarCurrrent", id));
+    currentImageIds.forEach((id) =>
+      formData.append("listIdAvatarCurrrent", id)
+    );
 
     // Only add images to formData if there are new images
 
-    images.forEach(image => formData.append("images", image));
+    images.forEach((image) => formData.append("images", image));
 
     try {
       await PostService.updatePost(post.id, formData);
@@ -71,6 +80,9 @@ const PostUpdate = ({ post, refreshPosts, onClose }) => {
       onClose();
     } catch (error) {
       console.error("Error updating post:", error);
+    }
+    finally{
+      setIsSaveLoading(false);  
     }
   };
 
@@ -153,9 +165,25 @@ const PostUpdate = ({ post, refreshPosts, onClose }) => {
               </div>
             ))}
           </div>
-          <Button type="submit" variant="primary" style={{marginLeft: "30%", marginTop:"20px"}}>
-          Cập nhật bài viết
-          </Button>
+          {isSaveLoading ? (
+            <div className="loadingio-spinner-ellipsis-ilx1jirdsl" style={{ marginLeft: "170px", marginTop: "20px" }}>
+              <div className="ldio-qk6putkpoq">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+              </div>
+            </div>
+          ) : (
+            <Button
+              type="submit"
+              variant="primary"
+              style={{ marginLeft: "30%", marginTop: "20px" }}
+            >
+              Cập nhật bài viết
+            </Button>
+          )}
         </Form>
       </Modal.Body>
     </Modal>

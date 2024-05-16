@@ -123,8 +123,10 @@ function HeaderDetail(prop) {
               <Link to={`/login`} className="link-user-login">
                 <div className="dropdown-menu-choice">Đăng nhập</div>
               </Link>
-
+              <Link to={`/signup`} className="link-user-login">
               <div className="dropdown-menu-choice">Đăng ký</div>
+
+              </Link>
             </div>
           )}
         </div>

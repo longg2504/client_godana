@@ -30,7 +30,7 @@ const AccountSetting = () => {
                             </div>
                         </div>
                     </Link>
-                    <Link className='link-to-choice-account-setting'>
+                    <Link className='link-to-choice-account-setting' to={"/user/account-setting/change-password"}>
                         <div className='choice-account-setting'>
                             <div className='svg-account-setting-div'>
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true" role="presentation" focusable="false"

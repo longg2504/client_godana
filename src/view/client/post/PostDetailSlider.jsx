@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom';
 
 const VirtualizeSwipeableViews = virtualize(AutoPlaySwipeableViews);
 
-export default function PostSlider({ post , handleShowDetail}) {
+export default function PostDetailSlider({ post }) {
     const theme = useTheme();
     
     // Kiểm tra số lượng ảnh trong post.postAvatar
@@ -41,13 +41,13 @@ export default function PostSlider({ post , handleShowDetail}) {
     }
 
     return (
-        <Box sx={{ maxWidth: 550, flexGrow: 1 }}>
+        <Box sx={{ maxWidth: 800, flexGrow: 1 }}>
             <VirtualizeSwipeableViews
                 index={activeStep}
                 onChangeIndex={setActiveStep}
                 enableMouseEvents
                 slideRenderer={({ index }) => (
-                    <div key={index} className="custom-image-container" onClick={() => {handleShowDetail(post)}}>
+                    <div key={index} className="custom-image-container">
                             <img
                                 className='img'
                                 onMouseEnter={() => setButtonOpacity(1)}
@@ -73,7 +73,7 @@ export default function PostSlider({ post , handleShowDetail}) {
                         className="stepper-button"
                         size="small"
                         onClick={handleNext}
-                        style={{ opacity: buttonOpacity , top:"140px" , right: "20px"}}
+                        style={{ opacity: buttonOpacity , top:"250px", right: "30px"}}
                         onMouseOut={() => setButtonOpacity(1)}
                         onMouseLeave={handleMouseLeave}
                     >
@@ -85,7 +85,7 @@ export default function PostSlider({ post , handleShowDetail}) {
                         className="stepper-button"
                         onMouseOut={() => setButtonOpacity(1)}
                         onMouseLeave={handleMouseLeave}
-                        style={{ opacity: buttonOpacity , top:"140px"}}
+                        style={{ opacity: buttonOpacity , top:"250px"}}
                         size="small"
                         onClick={handleBack}
                     >

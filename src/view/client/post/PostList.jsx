@@ -13,25 +13,12 @@ import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import PostService from "../../../service/PostService";
 import PostUpdate from "./PostUpdate";
-
-const CommentPopup = ({ show, handleClose, post }) => {
-  if (!show) return null;
-
-  return (
-    <div className="popup-overlay">
-      <div className="popup">
-        <h4>Comment for: {post.content}</h4>
-        <Button onClick={handleClose}>Close</Button>
-        {/* Bạn có thể thêm các chức năng để hiển thị và xử lý comment */}
-      </div>
-    </div>
-  );
-};
+import PostDetail from "./PostDetail";
 
 const PostList = () => {
   const [posts, setPosts] = useState([]);
   const [categoryId, setCategoryId] = useState("");
-  const [showCommentPopup, setShowCommentPopup] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
   const [likedPosts, setLikedPosts] = useState([]);
   const navigate = useNavigate();
@@ -45,9 +32,9 @@ const PostList = () => {
   const [postToEdit, setPostToEdit] = useState(null);
 
   // Xử lý khi người dùng nhấp vào nút chỉnh sửa
-  const handleEditPost =  (post) => {
-      setPostToEdit(post);
-      setShowEditPopup(true);
+  const handleEditPost = (post) => {
+    setPostToEdit(post);
+    setShowEditPopup(true);
   };
 
   // Xử lý khi đóng popup chỉnh sửa
@@ -55,8 +42,6 @@ const PostList = () => {
     setShowEditPopup(false); // Đóng popup
     setPostToEdit(null); // Xóa bài viết được chọn
   };
-
-  
 
   useEffect(() => {
     const getAllPostByCategory = async () => {
@@ -84,7 +69,7 @@ const PostList = () => {
     refreshPosts();
   }, []);
 
-  const getAllLikeListByUser = async() => {
+  const getAllLikeListByUser = async () => {
     if (userId) {
       try {
         const res = await LikeService.getAllLikeListByUser(userId);
@@ -101,13 +86,13 @@ const PostList = () => {
     getAllLikeListByUser();
   }, [userId]);
 
-  const handleCommentClick = (post) => {
+  const handleShowDetail = (post) => {
     setSelectedPost(post);
-    setShowCommentPopup(true);
+    setShowDetail(true);
   };
 
-  const handleClosePopup = () => {
-    setShowCommentPopup(false);
+  const handleClose = () => {
+    setShowDetail(false);
     setSelectedPost(null);
   };
 
@@ -201,7 +186,10 @@ const PostList = () => {
                 ? likedPosts.map((like) => like.post.id)
                 : [];
               const isPostLiked = likedPostIds.includes(post.id);
-              const isOwner = post.user && post.user.id && userId ? post.user.id.toString() === userId.toString() : false;
+              const isOwner =
+                post.user && post.user.id && userId
+                  ? post.user.id.toString() === userId.toString()
+                  : false;
               return (
                 <Row key={index} className="justify-content-center">
                   <Card className="mb-4 mx-auto" style={{ width: "600px" }}>
@@ -231,11 +219,8 @@ const PostList = () => {
                             id={`dropdown-${index}`}
                             variant="light"
                           >
-                            <Dropdown.Item
-                              onClick={() => handleEditPost(post)}
-                            >
+                            <Dropdown.Item onClick={() => handleEditPost(post)}>
                               Chỉnh sửa
-                             
                             </Dropdown.Item>
                             <Dropdown.Item
                               onClick={() => handleDeletePost(post.id)}
@@ -247,7 +232,10 @@ const PostList = () => {
                       </div>
                       <h3 style={{ textAlign: "center" }}>{post.title}</h3>
                       <p>{post.content}</p>
-                      <PostSlider post={post} />
+                      <PostSlider
+                        post={post}
+                        handleShowDetail={handleShowDetail}
+                      />
 
                       <div className="d-flex align-items-center">
                         <span className="me-2 text-muted">{post.like}</span>
@@ -264,7 +252,7 @@ const PostList = () => {
                         <Button
                           variant="button"
                           className="btn-action"
-                          onClick={() => handleCommentClick(post)}
+                          onClick={() => handleShowDetail(post)}
                         >
                           <FaComment /> Comment
                         </Button>
@@ -281,19 +269,24 @@ const PostList = () => {
           )}
         </Row>
       </Container>
+      {selectedPost && (
+        <PostDetail
+          post={selectedPost}
+          show={showDetail}
+          handleClose={handleClose}
+          handleLikeClick={handleLikeClick}
+          likedPosts={likedPosts}
+          refreshPosts={refreshPosts}
+        />
+      )}
 
-      <CommentPopup
-        show={showCommentPopup}
-        handleClose={handleClosePopup}
-        post={selectedPost}
-      />
-       {showEditPopup && postToEdit && (
-                                <PostUpdate
-                                  post={postToEdit}
-                                  refreshPosts={refreshPosts}
-                                  onClose={handleCloseEditPopup}
-                                />
-                              )}
+      {showEditPopup && postToEdit && (
+        <PostUpdate
+          post={postToEdit}
+          refreshPosts={refreshPosts}
+          onClose={handleCloseEditPopup}
+        />
+      )}
     </div>
   );
 };
