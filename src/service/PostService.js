@@ -17,6 +17,14 @@ class PostService  {
     static async updatePost(postId, data){
         return await axios.post(API_URL_POST + `/${postId}` , data)
     }
+
+    static async getAllPostByUser(userId){
+        return await axios.get(API_URL_POST + `/get_all_post_by_user/${userId}`)
+    }
+
+    static async deletedPost(postId){
+        return await axios.post(API_URL_POST + `/deleted/${postId}`)
+    }
     
 }   
 

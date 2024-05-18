@@ -184,7 +184,7 @@ export default function BodyDetail({setPlaceName}) {
           <div className="review">
             <div>
               <p>
-                {place.rating}
+                {Math.round(place.rating*10)/10}
                 <i className="fa-solid fa-star"></i>
                 <span className="text" style={{ textDecoration: "underline" }}>
                   {place.numberRating} đánh giá
@@ -358,7 +358,7 @@ export default function BodyDetail({setPlaceName}) {
           <div style={{ width: "1200px" }}>
             <div className="title">
               <h3>
-                <i className="fa-solid fa-star"></i> {place.rating} ·
+                <i className="fa-solid fa-star"></i> {Math.round(place.rating*10)/10} ·
                 <span className="text" style={{ textDecoration: "underline" }}>
                   {place.numberRating} đánh giá
                 </span>

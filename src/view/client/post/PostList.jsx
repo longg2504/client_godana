@@ -14,9 +14,14 @@ import DropdownButton from "react-bootstrap/DropdownButton";
 import PostService from "../../../service/PostService";
 import PostUpdate from "./PostUpdate";
 import PostDetail from "./PostDetail";
+import UseFetchCategory from '../../../hooks/client/UseFetchCategory';
+import ShowNoFilterResult from './ShowNoFilterResult';
+import { usePost } from "../../../context/PostContext";
+import { ToastContainer, toast } from "react-toastify";
+
 
 const PostList = () => {
-  const [posts, setPosts] = useState([]);
+  const {posts, setPosts,comfortableSelected, setComfortableSelected} = usePost();
   const [categoryId, setCategoryId] = useState("");
   const [showDetail, setShowDetail] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
@@ -24,6 +29,14 @@ const PostList = () => {
   const navigate = useNavigate();
   const userId = localStorage.getItem("id");
   const jwt = localStorage.getItem("jwt");
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const itemWidth = 220;
+  const categories = UseFetchCategory();
+  const [showSpinner, setShowSpinner] = useState(false);
+
+
+
+
 
   // Đầu tiên, thêm trạng thái để quản lý trạng thái của popup chỉnh sửa
   const [showEditPopup, setShowEditPopup] = useState(false);
@@ -166,8 +179,10 @@ const PostList = () => {
   };
   const handleDeletePost = async (postId) => {
     try {
-      await PostService.deletePost(postId, jwt);
-
+      await PostService.deletedPost(postId);
+      toast.success("xoá bài viết thành công", {
+        className: "custom-toast-create-new-wish-list-success",
+      });
       // Cập nhật danh sách bài viết sau khi xóa
       setPosts(posts.filter((post) => post.id !== postId));
     } catch (error) {
@@ -175,12 +190,99 @@ const PostList = () => {
     }
   };
 
+
+  const updateCategoryPosition = () => {
+    const translateX = -currentIndex * itemWidth;
+    return { transform: `translateX(${translateX}px)` };
+  };
+
+  const handleLeftArrowClick = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+    }
+  };
+
+  const handleRightArrowClick = () => {
+    if (currentIndex < categories.length - 5) {
+      setCurrentIndex(currentIndex + 1);
+    }
+  };
+
+  const handleSelectedComfotable = (id) => {
+    setComfortableSelected(id);
+  };
+
+
+
   return (
     <div>
+      <div className="category-container">
+          <div className="category-container">
+            <button className="arrow left-arrow" onClick={handleLeftArrowClick}>
+              <i className="fa-solid fa-circle-chevron-left"></i>
+            </button>
+            <div className="category" style={updateCategoryPosition()}>
+              <div
+                onClick={() => {
+                  setCategoryId("");
+                  handleSelectedComfotable(-1);
+                }}
+                className={`category-item ${
+                  comfortableSelected === -1
+                    ? "category-item-selected-comfortable"
+                    : ""
+                }`}
+              >
+                <i
+                  className="fas fa-globe"
+                  alt="Tất cả"
+                  style={{ width: "30px", height: "30px" }}
+                />
+                <p>Tất cả</p>
+              </div>
+              {categories.map((item, index) => (
+                <div
+                  key={item.id}
+                  onClick={() => {
+                    setCategoryId(item.id);
+                    handleSelectedComfotable(index);
+                  }}
+                  className={`category-item ${
+                    comfortableSelected === index
+                      ? "category-item-selected-comfortable"
+                      : ""
+                  }`}
+                >
+                  <i
+                    className={item.svg}
+                    alt={item.title}
+                    style={{ width: "30px", height: "30px" }}
+                  />
+                  <p>{item.title}</p>
+                </div>
+              ))}
+            </div>
+            <button
+              className="arrow right-arrow"
+              onClick={handleRightArrowClick}
+            >
+              <i className="fa-solid fa-circle-chevron-right"></i>
+            </button>
+          </div>
+
+          <div
+            className="spinner"
+            style={{ display: showSpinner ? "block" : "none" }}
+          >
+            <div className="bounce1"></div>
+            <div className="bounce2"></div>
+            <div className="bounce3"></div>
+          </div>
+        </div>
       <Container className="my-3">
         {userId && <PostCreation refreshPosts={refreshPosts} />}
         <Row className="justify-content-center">
-          {posts.length > 0 ? (
+          {Array.isArray(posts) && posts.length > 0 ? (
             posts.map((post, index) => {
               const likedPostIds = Array.isArray(likedPosts)
                 ? likedPosts.map((like) => like.post.id)
@@ -263,9 +365,10 @@ const PostList = () => {
               );
             })
           ) : (
-            <Col md={12}>
-              <p>Không có bài viết nào</p>
-            </Col>
+            <ShowNoFilterResult />
+            // <Col md={12}>
+            //   <p>Không có bài viết nào</p>
+            // </Col>
           )}
         </Row>
       </Container>

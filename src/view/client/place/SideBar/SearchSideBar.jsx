@@ -76,7 +76,15 @@ const SearchSidebar = () => {
         <Form.Label>Rating:</Form.Label>
         <Form.Select value={rating} onChange={e => setRating(e.target.value)}>
           <option value="">Chọn rating</option>
-          {/* Additional rating values */}
+          <option value="1">1</option>
+          <option value="1.5">1.5</option>
+          <option value="2">2</option>
+          <option value="2.5">2.5</option>
+          <option value="3">3</option>
+          <option value="3.5">3.5</option>
+          <option value="4">4</option>
+          <option value="4.5">4.5</option>
+          <option value="5">5</option>
         </Form.Select>
       </Form.Group>
 

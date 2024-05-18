@@ -25,7 +25,6 @@ export default function Body() {
   const categories = UseFetchCategory();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentIndexInt, setCurrentIndexInt] = useState(itemsPerLoad);
-  const [comfortableSelected, setComfortableSelected] = useState(null);
   const [showSpinner, setShowSpinner] = useState(false);
   const [showMapList, setshowMapList] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
@@ -46,6 +45,7 @@ export default function Body() {
     rating,
     placeList,
     setPlaceList,
+    comfortableSelected, setComfortableSelected
   } = usePlace();
 
   const updateCategoryPosition = () => {
@@ -182,14 +182,7 @@ export default function Body() {
   };
 
   useEffect(() => {
-    async function getPlaceListByCategoryAndSearch(
-      categoryId,
-      searchValue,
-      district,
-      ward,
-      address,
-      rating
-    ) {
+    async function getPlaceListByCategoryAndSearch() {
       let res = await PlaceService.getPlaceListByCategoryAndSearch(
         categoryId,
         searchValue,
@@ -201,7 +194,11 @@ export default function Body() {
       setPlaceList(res.data.content);
       setLoading(false);
     }
-    getPlaceListByCategoryAndSearch(
+    getPlaceListByCategoryAndSearch();
+  }, [categoryId, searchValue, district, ward, address, rating]);
+
+  const refreshPlaces = async () => {
+    const res = await PlaceService.getPlaceListByCategoryAndSearch(
       categoryId,
       searchValue,
       district,
@@ -209,7 +206,12 @@ export default function Body() {
       address,
       rating
     );
-  }, [categoryId, searchValue, district, ward, address, rating]);
+    setPlaceList(res.data.content);
+    setLoading(false);
+  }
+  useEffect(() => {
+    refreshPlaces();
+  }, []);
 
   return (
     <div>
@@ -340,7 +342,7 @@ export default function Body() {
             </MapContainer>
           </div>
         ) : (
-          <PlaceList loading={loading} />
+          <PlaceList loading={loading} refreshPlaces={refreshPlaces}/>
         )}
       </>
     </div>

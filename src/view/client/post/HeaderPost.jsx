@@ -3,19 +3,17 @@ import "../../../../node_modules/@fortawesome/fontawesome-free/css/all.min.css"
 import '../place/css/Client.css'
 import logo from "../../../images/logoGoDana.png";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import FavouriteService from "../../../service/FavouriteService";
-import { ToastContainer, toast } from "react-toastify";
-import { usePlace } from '../../../context/PlaceContext';
+import PostService from "../../../service/PostService";
+import { usePost } from "../../../context/PostContext";
 
 
 function HeaderPost() {
-  const { searchValue, setSearchValue } = usePlace();
   const jwtValue = localStorage.getItem("jwt");
   const username = localStorage.getItem("username");
   const avatar = localStorage.getItem("avatar");
   const id = localStorage.getItem("id");
-  const { placeLiked, setPlaceLiked, setPlaceList } = usePlace();
   const navigate = useNavigate();
+  const {posts, setPosts, comfortableSelected, setComfortableSelected} = usePost();
 
   const [isOpenDropMenuLogin, setIsOpenDropMenuLogin] = useState(false);
   const [isOpenDropMenuLoginWithJWT, setIsOpenDropMenuLoginWithJWT] =
@@ -41,25 +39,16 @@ function HeaderPost() {
     navigate("/", { replace: true });
   };
 
-  const getFavoriteList = async () => {
+  const getAllPostByUser = async () => {
     if (id !== null) {
       try {
-        const resp = await FavouriteService.getFavouriteListByUser(id);
-        if(resp.status === 204) {
-          toast.error("Tài khoản hiện tại không có danh sách yêu thích nào", {
-            className: "custom-toast-create-new-wish-list-success",
-          });
-          setIsOpenDropMenuLoginWithJWT(false);
-        }
-        else{
-          setPlaceLiked(resp.data);
-          const likedPlaceIds = placeLiked.map((item) => item.place);
-          setPlaceList(likedPlaceIds);
-          setIsOpenDropMenuLoginWithJWT(false);
-        }
+        const resp = await PostService.getAllPostByUser(id);
+        setPosts(resp.data);
+        setComfortableSelected(null);
+        setIsOpenDropMenuLoginWithJWT(false);
         
       } catch (err) {
-        console.error("Lỗi khi lấy danh sách yêu thích:", err);
+        console.error("Lỗi khi lấy danh sách bài viết:", err);
       }
     } else {
       console.error("Id user không tồn tại");
@@ -138,8 +127,8 @@ function HeaderPost() {
 
           {isOpenDropMenuLoginWithJWT && (
             <div className="dropdown-menu-login">
-              <Link className="link-user-login" onClick={getFavoriteList}>
-                <div className="dropdown-menu-choice">Danh sách yêu thích</div>
+              <Link className="link-user-login" onClick={getAllPostByUser}>
+                <div className="dropdown-menu-choice">Bài viết của tôi</div>
               </Link>
               <hr />
               <Link className="link-user-login" to={"/user/account-setting"}>

@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import UseFetchPlace from "../../../../hooks/client/UseFetchPlace";
 import LoadingPlaceList from "./LoadingPlace";
 import PlaceSlider from "./PlaceSlider";
 import { IonIcon } from "@ionic/react";
@@ -18,10 +17,9 @@ import startRating from "../../../../utils/StarRating";
 import SearchSidebar from "../SideBar/SearchSideBar";
 import FavouriteService from "../../../../service/FavouriteService";
 import Swal from "sweetalert";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-export default function PlaceList(prop) {
-  const loading = prop.loading;
+export default function PlaceList(loading ) {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [showMapStates, setShowMapStates] = useState({});
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
@@ -81,19 +79,18 @@ export default function PlaceList(prop) {
     }
   }, [id]);
 
-  const createFavouriteList = (placeId, userId) => {
+  const createFavouriteList = async (placeId, userId) => {
     const data = {
       placeId: placeId,
       userId: userId,
     };
     if (id !== null) {
-      FavouriteService.createFavouriteList(data);
+      const res = await FavouriteService.createFavouriteList(data);
       try {
         toast.success("Thêm danh sách yêu thích thành công", {
           className: "custom-toast-create-new-wish-list-success",
         });
-
-          setPlaceLiked([...placeLiked, {place: {id: placeId}}]) 
+        setPlaceLiked([...placeLiked,  res.data]);
       } catch (error) {
         toast.error("Lỗi khi thêm danh sách yêu thích", {
           className: "custom-toast-create-new-wish-list-success",
@@ -118,7 +115,7 @@ export default function PlaceList(prop) {
         toast.success("Đã xoá khỏi danh sách", {
           className: "custom-toast-create-new-wish-list-success",
         });
-        setPlaceLiked(placeLiked.filter(e => e.place.id != placeId))
+        setPlaceLiked(placeLiked.filter((e) => e.place.id != placeId));
       } catch (err) {
         toast.error("Lỗi khi xóa nhà yêu thích", {
           className: "custom-toast-create-new-wish-list-success",
@@ -128,7 +125,7 @@ export default function PlaceList(prop) {
   };
   useEffect(() => {
     console.log(placeLiked);
-  }, [placeLiked])
+  }, [placeLiked]);
   return (
     <>
       <div>
@@ -151,7 +148,9 @@ export default function PlaceList(prop) {
               <LoadingPlaceList />
             ) : Array.isArray(placeList) && placeList.length > 0 ? (
               placeList?.map((place, index) => {
-                const likedPlaceIds = Array.isArray(placeLiked) ? placeLiked.map(item => item.place.id) : [];
+                const likedPlaceIds = Array.isArray(placeLiked)
+                  ? placeLiked.map((item) => item.place.id)
+                  : [];
                 const isPlaceLiked = likedPlaceIds.includes(place.id);
 
                 return (
@@ -221,25 +220,32 @@ export default function PlaceList(prop) {
                       )}
                     </div>
                     <div>
-                      <div className="listing-header">
-                        <h3 className="hotel-name">{place?.placeTitle}</h3>
-                        <div className="review">
-                          <h4>
-                            {startRating(place.rating ? place.rating : 0)}
-                          </h4>
-                          <span style={{ fontSize: "13px" }}>
-                            {place.locationRegion?.address +
-                              ", " +
-                              place.locationRegion?.wardName +
-                              ", " +
-                              place.locationRegion?.districtName +
-                              ", " +
-                              place.locationRegion?.provinceName +
-                              ", "}
+                      <Link to={`/place/${place.id}`}  className="link">
+                        <div className="listing-header">
+                          <h3 className="hotel-name">{place?.placeTitle}</h3>
+                          <div className="review">
+                            <h4>
+                              {startRating(place.rating ? place.rating : 0)}
+                            </h4>
+                            <span style={{ fontSize: "13px" }}>
+                              {place.locationRegion?.address +
+                                ", " +
+                                place.locationRegion?.wardName +
+                                ", " +
+                                place.locationRegion?.districtName +
+                                ", " +
+                                place.locationRegion?.provinceName +
+                                ", "}
+                            </span>
+                          </div>
+                          <span>
+                            {checkOpenClose(
+                              place.contact.openTime,
+                              place.contact.closeTime
+                            )}
                           </span>
                         </div>
-                        <span>{checkOpenClose(place.contact.openTime, place.contact.closeTime)}</span>
-                      </div>
+                      </Link>
                     </div>
                   </div>
                 );

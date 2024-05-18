@@ -9,7 +9,7 @@ import { ToastContainer, toast } from "react-toastify";
 
 
 function Header() {
-  const { searchValue, setSearchValue } = usePlace();
+  const { searchValue, setSearchValue, comfortableSelected, setComfortableSelected } = usePlace();
   const jwtValue = localStorage.getItem("jwt");
   const username = localStorage.getItem("username");
   const avatar = localStorage.getItem("avatar");
@@ -55,6 +55,7 @@ function Header() {
           setPlaceLiked(resp.data);
           const likedPlaceIds = placeLiked.map((item) => item.place);
           setPlaceList(likedPlaceIds);
+          setComfortableSelected(null);
           setIsOpenDropMenuLoginWithJWT(false);
         }
         
