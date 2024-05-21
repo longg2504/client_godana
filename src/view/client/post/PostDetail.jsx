@@ -1,11 +1,21 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Modal, Button, Form, ListGroup, Image } from "react-bootstrap";
+import {
+  Modal,
+  Button,
+  Form,
+  ListGroup,
+  Image,
+  DropdownButton,
+  Dropdown,
+  FormGroup,
+} from "react-bootstrap";
 import userImage from "../../../images/user.png";
 import { formatDistanceToNow } from "date-fns";
 import { FaThumbsUp, FaComment, FaPaperPlane } from "react-icons/fa";
 import CommentService from "../../../service/CommentService";
 import PostDetailSlider from "./PostDetailSlider";
 import "./css/postDetail.css";
+import PostService from "../../../service/PostService";
 
 function PostDetail({
   post,
@@ -30,6 +40,9 @@ function PostDetail({
   const replyInputRef = useRef(null);
   const [replyingTo, setReplyingTo] = useState(null);
   const [replyValue, setReplyValue] = useState("");
+  const [editingComment, setEditingComment] = useState(null);
+  const [editingReply, setEditingReply] = useState(null);
+  const [editContent, setEditContent] = useState("");
   const userId = localStorage.getItem("id");
   const avatar = localStorage.getItem("avatar");
 
@@ -37,10 +50,9 @@ function PostDetail({
     const getAllCommentParentByPost = async () => {
       const res = await CommentService.getCommentParentByPostId(post.id);
       setCommentList(res.data);
-      console.log(res.data, "res");
     };
     getAllCommentParentByPost();
-  }, []);
+  }, [post.id]);
 
   const handleLike = (postId) => {
     handleLikeClick(postId);
@@ -63,19 +75,13 @@ function PostDetail({
       userId: userId,
     };
 
-    console.log("Submitting comment:", data);
-
     try {
       await CommentService.createComment(data);
       setComment("");
-      // Gọi lại hàm để lấy danh sách bình luận mới nhất
       const res = await CommentService.getCommentParentByPostId(post.id);
       setCommentList(res.data);
-
       setCommentCount(commentCount + 1);
-
       refreshPosts();
-      console.log("Updated comments list:", res.data);
     } catch (error) {
       console.error("Error submitting comment:", error);
     }
@@ -87,7 +93,7 @@ function PostDetail({
 
   const handleReplyClick = async (commentId) => {
     if (!replies[commentId]) {
-      const res = await CommentService.getAllReplyByCommentId(commentId); // You need to implement this API call
+      const res = await CommentService.getAllReplyByCommentId(commentId);
       setReplies({ ...replies, [commentId]: res.data });
     }
     setReplyingTo(replyingTo === commentId ? null : commentId);
@@ -103,12 +109,77 @@ function PostDetail({
     try {
       await CommentService.createReply(commentId, data);
       setReplyValue("");
-      const res = await CommentService.getAllReplyByCommentId(commentId); // You need to implement this API call
+      const res = await CommentService.getAllReplyByCommentId(commentId);
       setReplies({ ...replies, [commentId]: res.data });
-      setCommentCount(commentCount + 1);
       refreshPosts();
+      setCommentCount(post.comment);
     } catch (error) {
       console.error("Error submitting reply:", error);
+    }
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    try {
+      await CommentService.deletedComment(commentId);
+      const res = await CommentService.getCommentParentByPostId(post.id);
+      const response = await PostService.getPostById(post.id);
+      setCommentList(res.data);
+      setCommentCount(response.data.comment);
+      refreshPosts();
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+    }
+  };
+
+  const handleEditComment = (comment) => {
+    console.log(comment, "comment");
+    setEditingComment(comment.commentId);
+    setEditContent(comment.content);
+  };
+
+  const handleUpdateComment = async () => {
+    try {
+      await CommentService.updateComment(editingComment, {
+        content: editContent,
+      });
+      const res = await CommentService.getCommentParentByPostId(post.id);
+      setCommentList(res.data);
+      setEditingComment(null);
+      setEditContent("");
+      refreshPosts();
+    } catch (error) {
+      console.error("Error updating comment:", error);
+    }
+  };
+
+  const handleEditReply = (reply) => {
+    setEditingReply(reply.commentId);
+    setEditContent(reply.content);
+  };
+
+  const handleUpdateReply = async (commentId) => {
+    console.log("commentId" , commentId)
+    try {
+      await CommentService.updateComment(editingReply, { content: editContent });
+      const res = await CommentService.getAllReplyByCommentId(commentId);
+      setReplies({ ...replies, [commentId]: res.data });
+      setEditingReply(null);
+      setEditContent("");
+      refreshPosts();
+    } catch (error) {
+      console.error("Error updating reply:", error);
+    }
+  };
+
+  const handleDeleteReply = async (replyId, commentId) => {
+    try {
+      await CommentService.deletedComment(replyId);
+      const res = await CommentService.getAllReplyByCommentId(commentId);
+      setReplies({ ...replies, [commentId]: res.data });
+      setCommentCount(commentCount - 1);
+      refreshPosts();
+    } catch (error) {
+      console.error("Error deleting reply:", error);
     }
   };
 
@@ -163,123 +234,254 @@ function PostDetail({
         <hr />
         <ListGroup variant="flush">
           {commentList &&
-            commentList.map((comment, idx) => (
-              <ListGroup.Item key={idx} style={{ border: "none !important" }}>
-                <div className="d-flex">
-                  <Image
-                    src={comment.user.avatar.fileUrl || userImage}
-                    alt="Avatar"
-                    roundedCircle
-                    style={{ width: "30px", height: "30px" }}
-                  />
-                  <div className="ms-1 comment-item">
-                    <strong>{comment.user.username}</strong>
-                    <p style={{ margin: "0 auto" }}>{comment.content}</p>
-                  </div>
-                </div>
-                <div style={{ marginLeft: "40px" }}>
-                  <small className="text-muted">
-                    {formatDistanceToNow(new Date(comment.createdAt), {
-                      addSuffix: true,
-                    })}
-                  </small>
-                  <small style={{ marginLeft: "10px" }}>
-                    <Button
-                      onClick={() => handleReplyClick(comment.commentId)}
-                      variant="none"
-                      style={{ fontSize: "12px", padding: "0" }}
-                    >
-                      Phản hồi
-                    </Button>
-                  </small>
-                  <div
-                    onClick={() => handleReplyClick(comment.commentId)}
-                    style={{
-                      fontSize: "14px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    {replies[comment.commentId] &&
-                    replies[comment.commentId].length > 0
-                      ? replies[comment.commentId].length
-                      : comment.countReply}{" "}
-                    phản hồi
-                  </div>
-                </div>
-                {/* reply */}
-                {replies[comment.commentId] &&
-                  replyingTo === comment.commentId && (
-                    <ListGroup variant="flush" style={{ marginLeft: "25px" }}>
-                      {replies[comment.commentId].map((reply) => (
-                        <ListGroup.Item key={reply.replyId}>
-                          <div className="d-flex">
-                            <Image
-                              src={reply.user.avatar.fileUrl || userImage}
-                              alt="Avatar"
-                              roundedCircle
-                              style={{ width: "30px", height: "30px" }}
-                            />
-                            <div className="ms-1 comment-item">
-                              <strong>{reply.user.username}</strong>
-                              <p style={{ margin: "0 auto" }}>
-                                {reply.content}
-                              </p>
-                            </div>
-                          </div>
-                          <div style={{ marginLeft: "40px" }}>
-                            <small className="text-muted">
-                              {formatDistanceToNow(new Date(reply.createdAt), {
-                                addSuffix: true,
-                              })}
-                            </small>
-                          </div>
-                        </ListGroup.Item>
-                      ))}
-                    </ListGroup>
-                  )}
-                {replyingTo === comment.commentId && (
-                  <Form>
-                    <Form.Group
-                      className="mb-3 d-flex align-items-center"
-                      controlId="replyInput"
-                      style={{ position: "relative" }}
-                    >
-                      <Image
-                        src={avatar || userImage}
-                        alt="Avatar"
-                        roundedCircle
-                        style={{
-                          width: "30px",
-                          height: "30px",
-                          marginRight: "20px",
-                        }}
-                      />
-                      <Form.Control
-                        type="text"
-                        placeholder="Write a reply..."
-                        value={replyValue}
-                        onChange={(e) => setReplyValue(e.target.value)}
-                        ref={replyInputRef}
-                        onKeyPress={(e) => {
-                          if (e.key === "Enter" && replyValue.trim()) {
-                            e.preventDefault();
-                            submitReply(comment.commentId);
-                          }
-                        }}
-                        style={{ flexGrow: 1 }}
-                      />
-                      <Button
-                        variant="link"
-                        onClick={() => submitReply(comment.commentId)}
-                        style={{ position: "absolute", top: "0", right: "0", height: "38px" }}
+            commentList.map((comment, idx) => {
+              const isOwner =
+                comment.user && comment.user.id && userId
+                  ? comment.user.id.toString() === userId.toString()
+                  : false;
+              return (
+                <ListGroup.Item
+                  key={comment.commentId}
+                  style={{ border: "none !important" }}
+                >
+                  <div className="d-flex">
+                    <Image
+                      src={comment.user.avatar.fileUrl || userImage}
+                      alt="Avatar"
+                      roundedCircle
+                      style={{ width: "30px", height: "30px" }}
+                    />
+                    <div className="ms-1 comment-item">
+                      <strong>{comment.user.username}</strong>
+                      {editingComment === comment.commentId ? (
+                        <FormGroup style={{ position: "relative" }} >
+                          <Form.Control
+                            type="text"
+                            value={editContent}
+                            onChange={(e) => setEditContent(e.target.value)}
+                            style={{ flexGrow: 1 , width :"500px"} }
+
+                            onKeyPress={(e) => {
+                              if (e.key === "Enter") {
+                                handleUpdateComment();
+                              }
+                            }}
+                            // style={{ margin: "0 auto" }}
+                          />
+                          <Button
+                            variant="link"
+                            onClick={handleUpdateComment}
+                            disabled={!editContent.trim()}
+                            style={{
+                              position: "absolute",
+                              top: "0",
+                              right: "0",
+                              height: "38px",
+                            }}
+                          >
+                            <FaPaperPlane color="blue" />
+                          </Button>
+                        </FormGroup>
+                      ) : (
+                        <p style={{ margin: "0 auto" }}>{comment.content}</p>
+                      )}
+                    </div>
+                    {isOwner && (
+                      <DropdownButton
+                        id={`dropdown-comment-${idx}`}
+                        variant=""
+                        size="sm"
+                        title=""
+                        style={{ marginLeft: "10px" }}
                       >
-                        <FaPaperPlane color="blue" />
+                        <Dropdown.Item
+                          onClick={() => handleEditComment(comment)}
+                        >
+                          Chỉnh sửa
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                          onClick={() => handleDeleteComment(comment.commentId)}
+                        >
+                          Xoá
+                        </Dropdown.Item>
+                      </DropdownButton>
+                    )}
+                  </div>
+
+                  <div style={{ marginLeft: "40px" }}>
+                    <small className="text-muted">
+                      {formatDistanceToNow(new Date(comment.createdAt), {
+                        addSuffix: true,
+                      })}
+                    </small>
+
+                    <small style={{ marginLeft: "10px" }}>
+                      <Button
+                        onClick={() => handleReplyClick(comment.commentId)}
+                        variant="none"
+                        style={{ fontSize: "12px", padding: "0" }}
+                      >
+                        Phản hồi
                       </Button>
-                    </Form.Group>
-                  </Form>
-                )}
-              </ListGroup.Item>
-            ))}
+                    </small>
+                    <div
+                      onClick={() => handleReplyClick(comment.commentId)}
+                      style={{
+                        fontSize: "14px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {replies[comment.commentId] &&
+                      replies[comment.commentId].length > 0
+                        ? replies[comment.commentId].length
+                        : comment.countReply}{" "}
+                      phản hồi
+                    </div>
+                  </div>
+                  {replies[comment.commentId] &&
+                    replyingTo === comment.commentId && (
+                      <ListGroup variant="flush" style={{ marginLeft: "25px" }}>
+                        {replies[comment.commentId].map((reply) => {
+                          const isReplyOwner =
+                            reply.user.id.toString() === userId.toString();
+                          return (
+                            <ListGroup.Item key={reply.commentId}>
+                              <div className="d-flex">
+                                <Image
+                                  src={reply.user.avatar.fileUrl || userImage}
+                                  alt="Avatar"
+                                  roundedCircle
+                                  style={{ width: "30px", height: "30px" }}
+                                />
+                                <div className="ms-1 comment-item">
+                                  <strong>{reply.user.username}</strong>
+                                  {editingReply === reply.commentId ? (
+                                    <FormGroup style={{ position: "relative" }}>
+                                      <Form.Control
+                                        type="text"
+                                        value={editContent}
+                                        style={{ flexGrow: 1 , width :"500px"} }
+                                        onChange={(e) =>
+                                          setEditContent(e.target.value)
+                                        }
+                                        onKeyPress={(e) => {
+                                          if (e.key === "Enter") {
+                                            handleUpdateReply(comment.commentId);
+                                          }
+                                        }}
+                                      />
+
+                                      <Button
+                                        variant="link"
+                                        onClick={() => handleUpdateReply(comment.commentId)}
+                                        disabled={!editContent.trim()}
+                                        style={{
+                                          position: "absolute",
+                                          top: "0",
+                                          right: "0",
+                                          height: "38px",
+                                        }}
+                                      >
+                                        <FaPaperPlane color="blue" />
+                                      </Button>
+                                    </FormGroup>
+                                  ) : (
+                                    <p style={{ margin: "0 auto" }}>
+                                      {reply.content}
+                                    </p>
+                                  )}
+                                </div>
+                                {isReplyOwner && (
+                                  <DropdownButton
+                                    id={`dropdown-reply-${reply.replyId}`}
+                                    variant=""
+                                    size="sm"
+                                    title=""
+                                    style={{ marginLeft: "10px" }}
+                                  >
+                                    <Dropdown.Item
+                                      onClick={() => handleEditReply(reply)}
+                                    >
+                                      Chỉnh sửa
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                      onClick={() =>
+                                        handleDeleteReply(
+                                          reply.commentId,
+                                          comment.commentId
+                                        )
+                                      }
+                                    >
+                                      Xoá
+                                    </Dropdown.Item>
+                                  </DropdownButton>
+                                )}
+                              </div>
+                              <div style={{ marginLeft: "40px" }}>
+                                <small className="text-muted">
+                                  {formatDistanceToNow(
+                                    new Date(reply.createdAt),
+                                    {
+                                      addSuffix: true,
+                                    }
+                                  )}
+                                </small>
+                              </div>
+                            </ListGroup.Item>
+                          );
+                        })}
+                      </ListGroup>
+                    )}
+                  {replyingTo === comment.commentId && (
+                    <Form>
+                      <Form.Group
+                        className="mb-3 d-flex align-items-center"
+                        controlId="replyInput"
+                        style={{ position: "relative" }}
+                      >
+                        <Image
+                          src={avatar || userImage}
+                          alt="Avatar"
+                          roundedCircle
+                          style={{
+                            width: "30px",
+                            height: "30px",
+                            marginRight: "20px",
+                          }}
+                        />
+                        <Form.Control
+                          type="text"
+                          placeholder="Write a reply..."
+                          value={replyValue}
+                          onChange={(e) => setReplyValue(e.target.value)}
+                          ref={replyInputRef}
+                          onKeyPress={(e) => {
+                            if (e.key === "Enter" && replyValue.trim()) {
+                              e.preventDefault();
+                              submitReply(comment.commentId);
+                            }
+                          }}
+                          style={{ flexGrow: 1 }}
+                        />
+                        <Button
+                          variant="link"
+                          onClick={() => submitReply(comment.commentId)}
+                          disabled={!replyValue.trim()}
+                          style={{
+                            position: "absolute",
+                            top: "0",
+                            right: "0",
+                            height: "38px",
+                          }}
+                        >
+                          <FaPaperPlane color="blue" />
+                        </Button>
+                      </Form.Group>
+                    </Form>
+                  )}
+                </ListGroup.Item>
+              );
+            })}
         </ListGroup>
         <Form>
           <Form.Group
@@ -300,6 +502,12 @@ function PostDetail({
               onChange={handleCommentChange}
               ref={commentInputRef}
               style={{ flexGrow: 1 }}
+              onKeyPress={(e) => {
+                if (e.key === "Enter" && comment.trim()) {
+                  e.preventDefault();
+                  submitComment();
+                }
+              }}
             />
             <Button
               variant="link"

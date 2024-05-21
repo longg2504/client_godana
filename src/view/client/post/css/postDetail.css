@@ -2,9 +2,9 @@
     border: 1px solid #dee2e6 !important; /* Màu viền tương tự như màu viền trong Bootstrap */
     border-radius: 30px !important;
     margin-bottom: 10px !important;
-    padding: 10px !important;
+    padding: 20px !important;
     background-color: #f8f9fa !important; /* Màu nền nhẹ */
-    max-width: 70% !important; /* Giới hạn chiều rộng tối đa */
+    max-width: 100% !important; /* Giới hạn chiều rộng tối đa */
     min-height: 50px !important; /* Chiều cao tối thiểu */
     word-wrap: break-word !important; /* Đảm bảo từ không bị tràn ra ngoài khung */
 }   

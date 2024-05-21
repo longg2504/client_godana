@@ -18,6 +18,8 @@ import UseFetchCategory from '../../../hooks/client/UseFetchCategory';
 import ShowNoFilterResult from './ShowNoFilterResult';
 import { usePost } from "../../../context/PostContext";
 import { ToastContainer, toast } from "react-toastify";
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
 
 
 const PostList = () => {
@@ -178,16 +180,30 @@ const PostList = () => {
     }
   };
   const handleDeletePost = async (postId) => {
-    try {
-      await PostService.deletedPost(postId);
-      toast.success("xoá bài viết thành công", {
-        className: "custom-toast-create-new-wish-list-success",
-      });
-      // Cập nhật danh sách bài viết sau khi xóa
-      setPosts(posts.filter((post) => post.id !== postId));
-    } catch (error) {
-      console.error("Lỗi khi xóa bài viết:", error);
-    }
+    confirmAlert({
+      title: 'Xác nhận xóa',
+      message: 'Bạn có chắc chắn muốn xóa bài viết này không?',
+      buttons: [
+        {
+          label: 'Có',
+          onClick: async () => {
+            try {
+              await PostService.deletedPost(postId);
+              toast.success("Xóa bài viết thành công", {
+                className: "custom-toast-create-new-wish-list-success",
+              });
+              setPosts(posts.filter((post) => post.id !== postId));
+            } catch (error) {
+              console.error("Lỗi khi xóa bài viết:", error);
+            }
+          }
+        },
+        {
+          label: 'Không',
+          onClick: () => { }
+        }
+      ]
+    });
   };
 
 
@@ -366,9 +382,6 @@ const PostList = () => {
             })
           ) : (
             <ShowNoFilterResult />
-            // <Col md={12}>
-            //   <p>Không có bài viết nào</p>
-            // </Col>
           )}
         </Row>
       </Container>

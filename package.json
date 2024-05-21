@@ -27,6 +27,7 @@
     "rc-slider": "^10.2.1",
     "react": "^17.0.0 || ^18.0.0",
     "react-bootstrap": "^2.10.2",
+    "react-confirm-alert": "^3.0.6",
     "react-dom": "^17.0.0 || ^18.0.0",
     "react-hook-form": "^7.51.4",
     "react-icons": "^5.2.1",

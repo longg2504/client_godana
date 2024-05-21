@@ -17,6 +17,14 @@ class CommentService  {
     static async createReply(commentId, data){
         return await axios.post(API_URL_COMMENT + `/${commentId}` , data)
     }
+
+    static async deletedComment(commentId){
+        return await axios.post(API_URL_COMMENT + `/deleted/${commentId}`)
+    }
+
+    static async updateComment(commentId, data){
+        return await axios.post(API_URL_COMMENT + `/update/${commentId}` , data)
+    }
 }   
 
 export default CommentService;
