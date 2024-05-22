@@ -6,54 +6,48 @@ import PostService from "../../../service/PostService";
 import userImage from "../../../images/user.png";
 import UseFetchCategory from "../../../hooks/client/UseFetchCategory";
 
+const MAX_CONTENT_LENGTH = 500;
+
 export default function PostCreation({ refreshPosts }) {
   const [showForm, setShowForm] = useState(false);
-  const [title, setTitle] = useState(""); // Trạng thái lưu tiêu đề của bài viết
+  const [title, setTitle] = useState("");
   const [postContent, setPostContent] = useState("");
   const [images, setImages] = useState([]);
-  const [imagePreviews, setImagePreviews] = useState([]); // Trạng thái cho URL tạm của ảnh đã chọn
-  const [selectedCategory, setSelectedCategory] = useState(""); // Trạng thái lưu danh mục đã chọn
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
   const jwt = localStorage.getItem("jwt");
   const userId = localStorage.getItem("id");
   const avatar = localStorage.getItem("avatar");
   const name = localStorage.getItem("name");
   const nameParts = name.split(" ");
   const lastName = nameParts[nameParts.length - 1];
-  const categories = UseFetchCategory(); // Lấy danh sách danh mục từ hook
+  const categories = UseFetchCategory();
   const [isSaveLoading, setIsSaveLoading] = useState(false);
 
-  // Xử lý thay đổi nội dung bài viết
   const handlePostContentChange = (e) => {
-    setPostContent(e.target.value);
+    if (e.target.value.length <= MAX_CONTENT_LENGTH) {
+      setPostContent(e.target.value);
+    }
   };
 
-  // Xử lý thay đổi tiêu đề đã nhập
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
   };
 
-  // Xử lý thay đổi danh mục đã chọn
   const handleCategoryChange = (e) => {
     setSelectedCategory(e.target.value);
   };
 
-  // Xử lý thay đổi ảnh đã chọn
   const handleImagesChange = (e) => {
     const files = Array.from(e.target.files);
-
-    // Thêm các ảnh mới vào mảng hiện tại
     const newImages = [...images, ...files];
     setImages(newImages);
-
-    // Tạo URL tạm cho mỗi ảnh đã chọn
     const newImagePreviews = newImages.map((file) => URL.createObjectURL(file));
     setImagePreviews(newImagePreviews);
   };
 
-  // Xử lý khi gửi bài viết
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSaveLoading(true);
     if (!jwt) {
       Swal({
         title: "Thông báo!",
@@ -64,24 +58,44 @@ export default function PostCreation({ refreshPosts }) {
       return;
     }
 
+    if (!title || !postContent) {
+      Swal({
+        title: "Thông báo!",
+        text: "Tiêu đề và nội dung bài viết không được để trống",
+        icon: "error",
+        timer: 1000,
+      });
+      return;
+    }
+
+    if (postContent.length > MAX_CONTENT_LENGTH) {
+      Swal({
+        title: "Thông báo!",
+        text: "Nội dung bài viết không được quá 500 ký tự",
+        icon: "error",
+        timer: 1000,
+      });
+      return;
+    }
+
+    setIsSaveLoading(true);
+
     const formData = new FormData();
-    formData.append("postTitle", title); // Thêm tiêu đề đã nhập vào form dữ liệu
+    formData.append("postTitle", title);
     formData.append("content", postContent);
     formData.append("userId", userId);
-    formData.append("categoryId", selectedCategory); // Thêm danh mục đã chọn vào form dữ liệu
-
-    // Thêm các ảnh vào formData
+    formData.append("categoryId", selectedCategory);
     images.forEach((image) => {
-      formData.append(`images`, image);
+      formData.append("images", image);
     });
 
     try {
       const res = await PostService.createPost(formData);
       if (res.status === 200) {
-        setTitle(""); // Xóa tiêu đề sau khi gửi bài viết
+        setTitle("");
         setPostContent("");
         setImages([]);
-        setImagePreviews([]); // Xóa các URL tạm sau khi gửi bài viết
+        setImagePreviews([]);
         Swal({
           title: "Thành công!",
           text: "Bài viết đã được đăng thành công!",
@@ -93,29 +107,24 @@ export default function PostCreation({ refreshPosts }) {
       }
     } catch (error) {
       console.error("Lỗi khi tạo bài viết:", error);
-    }finally{
-      setIsSaveLoading(false); 
+    } finally {
+      setIsSaveLoading(false);
     }
   };
 
-  // Xử lý hiển thị form đăng bài viết
   const handleShowForm = () => {
     setShowForm(true);
   };
 
-  // Đóng form đăng bài viết
   const handleCloseForm = () => {
     setShowForm(false);
   };
 
-  // Xử lý xóa ảnh khỏi mảng
   const handleDeleteImage = (index) => {
-    // Loại bỏ ảnh tại vị trí chỉ định
     const newImages = [...images];
     newImages.splice(index, 1);
     setImages(newImages);
 
-    // Loại bỏ URL tạm của ảnh tương ứng
     const newImagePreviews = [...imagePreviews];
     newImagePreviews.splice(index, 1);
     setImagePreviews(newImagePreviews);
@@ -148,14 +157,12 @@ export default function PostCreation({ refreshPosts }) {
         </Card>
       </Row>
 
-      {/* Popup form đăng bài */}
       <Modal show={showForm} onHide={handleCloseForm}>
         <Modal.Header closeButton>
           <Modal.Title>Đăng bài viết</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit}>
-            {/* Trường nhập tiêu đề */}
             <Form.Control
               type="text"
               placeholder="Nhập tiêu đề bài viết"
@@ -171,9 +178,12 @@ export default function PostCreation({ refreshPosts }) {
               value={postContent}
               onChange={handlePostContentChange}
               className="mb-2"
+              maxLength={MAX_CONTENT_LENGTH}
             />
+            <div className="text-end">
+              {postContent.length}/{MAX_CONTENT_LENGTH}
+            </div>
 
-            {/* Thêm trường chọn danh mục */}
             <Form.Group controlId="formCategory" className="mb-2">
               <Form.Label>Danh mục:</Form.Label>
               <Form.Select
@@ -204,7 +214,6 @@ export default function PostCreation({ refreshPosts }) {
               </div>
             </div>
 
-            {/* Hiển thị ảnh đã chọn */}
             <div>
               {imagePreviews.map((src, index) => (
                 <div
@@ -221,7 +230,6 @@ export default function PostCreation({ refreshPosts }) {
                     alt={`Preview ${index}`}
                     style={{ width: "100px", height: "100px" }}
                   />
-                  {/* Nút xóa ảnh */}
                   <Button
                     variant="danger"
                     size="sm"

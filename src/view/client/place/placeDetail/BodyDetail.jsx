@@ -28,8 +28,9 @@ export default function BodyDetail({setPlaceName}) {
   const [isOverLayImagesSlider, setIsOverLayImagesSlider] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const {placeNerby, setPlaceNerby} = usePlace();
-  const [longitude, setLongitude] = useState("");
-  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState(null);
+  const [latitude, setLatitude] = useState(null);
+
 
 
   const jwt = localStorage.getItem('jwt')
@@ -39,13 +40,13 @@ export default function BodyDetail({setPlaceName}) {
     async function getPlaceDetail() {
       let res = await PlaceService.getPlaceDetailById(placeId);
       setPlace(res.data);
-      setLongitude(res.data.longitude);
-      setLatitude(res.data.latitude);
+      setLongitude(parseFloat(res.data.longitude));
+      setLatitude(parseFloat(res.data.latitude));
       setPlaceName(res.data.placeTitle)
 
     }
     getPlaceDetail();
-  }, [placeId,longitude, latitude]);
+  }, [placeId,longitude, latitude]);  
 
 
   useEffect(() => {
@@ -64,9 +65,6 @@ export default function BodyDetail({setPlaceName}) {
     getAllNerbyPlace();
 
   },[placeId])
-
-  console.log(longitude, "longitude");
-  console.log(latitude, "latitude")
 
   const sixLastestReviews =
     placeReivew?.length >= 6

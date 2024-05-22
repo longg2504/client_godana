@@ -119,9 +119,6 @@ const PostList = () => {
         icon: "error",
         timer: 1000,
       });
-      setTimeout(() => {
-        navigate("/login");
-      }, 1000);
       return;
     }
 

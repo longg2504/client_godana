@@ -16,6 +16,7 @@ import CommentService from "../../../service/CommentService";
 import PostDetailSlider from "./PostDetailSlider";
 import "./css/postDetail.css";
 import PostService from "../../../service/PostService";
+import Swal from "sweetalert";
 
 function PostDetail({
   post,
@@ -45,6 +46,7 @@ function PostDetail({
   const [editContent, setEditContent] = useState("");
   const userId = localStorage.getItem("id");
   const avatar = localStorage.getItem("avatar");
+  const jwt = localStorage.getItem("jwt");
 
   useEffect(() => {
     const getAllCommentParentByPost = async () => {
@@ -69,6 +71,16 @@ function PostDetail({
   };
 
   const submitComment = async () => {
+    if (!jwt) {
+      Swal({
+        title: "Thông báo!",
+        text: "Vui lòng đăng nhập để thực hiện tính năng này",
+        icon: "error",
+        timer: 1000,
+      });
+      return;
+    }
+
     const data = {
       content: comment,
       postId: post.id,
@@ -110,9 +122,10 @@ function PostDetail({
       await CommentService.createReply(commentId, data);
       setReplyValue("");
       const res = await CommentService.getAllReplyByCommentId(commentId);
+      const response = await PostService.getPostById(post.id);
       setReplies({ ...replies, [commentId]: res.data });
       refreshPosts();
-      setCommentCount(post.comment);
+      setCommentCount(response.data.comment);
     } catch (error) {
       console.error("Error submitting reply:", error);
     }
@@ -158,9 +171,11 @@ function PostDetail({
   };
 
   const handleUpdateReply = async (commentId) => {
-    console.log("commentId" , commentId)
+    console.log("commentId", commentId);
     try {
-      await CommentService.updateComment(editingReply, { content: editContent });
+      await CommentService.updateComment(editingReply, {
+        content: editContent,
+      });
       const res = await CommentService.getAllReplyByCommentId(commentId);
       setReplies({ ...replies, [commentId]: res.data });
       setEditingReply(null);
@@ -254,13 +269,12 @@ function PostDetail({
                     <div className="ms-1 comment-item">
                       <strong>{comment.user.username}</strong>
                       {editingComment === comment.commentId ? (
-                        <FormGroup style={{ position: "relative" }} >
+                        <FormGroup style={{ position: "relative" }}>
                           <Form.Control
                             type="text"
                             value={editContent}
                             onChange={(e) => setEditContent(e.target.value)}
-                            style={{ flexGrow: 1 , width :"500px"} }
-
+                            style={{ flexGrow: 1, width: "500px" }}
                             onKeyPress={(e) => {
                               if (e.key === "Enter") {
                                 handleUpdateComment();
@@ -360,20 +374,24 @@ function PostDetail({
                                       <Form.Control
                                         type="text"
                                         value={editContent}
-                                        style={{ flexGrow: 1 , width :"500px"} }
+                                        style={{ flexGrow: 1, width: "500px" }}
                                         onChange={(e) =>
                                           setEditContent(e.target.value)
                                         }
                                         onKeyPress={(e) => {
                                           if (e.key === "Enter") {
-                                            handleUpdateReply(comment.commentId);
+                                            handleUpdateReply(
+                                              comment.commentId
+                                            );
                                           }
                                         }}
                                       />
 
                                       <Button
                                         variant="link"
-                                        onClick={() => handleUpdateReply(comment.commentId)}
+                                        onClick={() =>
+                                          handleUpdateReply(comment.commentId)
+                                        }
                                         disabled={!editContent.trim()}
                                         style={{
                                           position: "absolute",

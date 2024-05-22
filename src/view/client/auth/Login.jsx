@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import * as React from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
@@ -14,13 +13,15 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router";
-import { useEffect } from "react";
 import Swal from "sweetalert";
-import { ADMIN, URL_BASE, USER } from "../../../constant/AppConstant";
-import AuthService from "../../../service/AuthService";
 import axios from "axios";
 import logo from "../../../images/Da-Nang.jpg";
-import { useState } from "react";
+import { useForm, Controller } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import AuthService from "../../../service/AuthService";
+import Alert from "@mui/material/Alert";
+import { URL_BASE, USER } from "../../../constant/AppConstant";
 
 export let instance = {};
 
@@ -32,7 +33,7 @@ function Copyright(props) {
       align="center"
       {...props}
     >
-      <Link color="inherit" href='/'>
+      <Link color="inherit" href="/">
         Go Da Nang Travel
       </Link>{" "}
       {new Date().getFullYear()}
@@ -43,31 +44,22 @@ function Copyright(props) {
 
 const defaultTheme = createTheme();
 
+const schema = yup.object().shape({
+  username: yup.string().required("Username is required"),
+  password: yup.string().required("Password is required"),
+});
+
 const LoginForm = () => {
-  const jwt = localStorage.getItem("jwt");
-  if (jwt) {
-    instance = axios.create({
-      baseURL: URL_BASE,
-      headers: {
-        Authorization: jwt,
-        "Content-Type": "application/json",
-      },
-    });
-  }
+  const { control, handleSubmit, formState: { errors } } = useForm({
+    resolver: yupResolver(schema),
+    mode: "onTouched",
+  });
 
   const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = event.currentTarget;
-    const obj = {
-      username: data.username.value,
-      password: data.password.value,
-    };
-
-    AuthService.login(obj)
+  const onSubmit = (data) => {
+    AuthService.login(data)
       .then((response) => {
-        console.log(response);
         localStorage.setItem("id", response.data.id);
         localStorage.setItem("jwt", response.data.token);
         localStorage.setItem("username", response.data.username);
@@ -100,9 +92,6 @@ const LoginForm = () => {
         }
       })
       .catch((error) => {
-        console.log("ssssss");
-        console.log(error);
-
         let message = "";
         if (error.response && error.response.data) {
           message =
@@ -160,28 +149,44 @@ const LoginForm = () => {
             <Box
               component="form"
               noValidate
-              onSubmit={handleSubmit}
+              onSubmit={handleSubmit(onSubmit)}
               sx={{ mt: 1 }}
             >
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="email"
-                label="username"
+              <Controller
                 name="username"
-                autoComplete="email"
-                autoFocus
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    margin="normal"
+                    required
+                    fullWidth
+                    label="Username"
+                    autoComplete="username"
+                    autoFocus
+                    error={!!errors.username}
+                    helperText={errors.username?.message}
+                  />
+                )}
               />
-              <TextField
-                margin="normal"
-                required
-                fullWidth
+              <Controller
                 name="password"
-                label="Password"
-                type="password"
-                id="password"
-                autoComplete="current-password"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    margin="normal"
+                    required
+                    fullWidth
+                    label="Password"
+                    type="password"
+                    autoComplete="current-password"
+                    error={!!errors.password}
+                    helperText={errors.password?.message}
+                  />
+                )}
               />
               <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}
@@ -208,4 +213,5 @@ const LoginForm = () => {
     </ThemeProvider>
   );
 };
+
 export default LoginForm;
