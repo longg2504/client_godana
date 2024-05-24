@@ -3,6 +3,7 @@ import { Modal, Button, Form } from "react-bootstrap";
 import { FaPlus, FaTrash } from "react-icons/fa";
 import PostService from "../../../service/PostService";
 import UseFetchCategory from "../../../hooks/client/UseFetchCategory";
+const MAX_CONTENT_LENGTH = 500;
 
 const PostUpdate = ({ post, refreshPosts, onClose }) => {
   const [title, setTitle] = useState(post ? post.title : "");
@@ -36,7 +37,9 @@ const PostUpdate = ({ post, refreshPosts, onClose }) => {
   };
 
   const handleContentChange = (e) => {
-    setContent(e.target.value);
+    if (e.target.value.length <= MAX_CONTENT_LENGTH) {
+      setContent(e.target.value);
+    }
   };
 
   const handleCategoryChange = (e) => {
@@ -60,6 +63,10 @@ const PostUpdate = ({ post, refreshPosts, onClose }) => {
 
   const handleUpdateSubmit = async (e) => {
     e.preventDefault();
+    if (content.length > MAX_CONTENT_LENGTH) {
+      alert(`Nội dung không được vượt quá ${MAX_CONTENT_LENGTH} ký tự.`);
+      return;
+    }
     setIsSaveLoading(true);
 
     const formData = new FormData();
@@ -71,7 +78,6 @@ const PostUpdate = ({ post, refreshPosts, onClose }) => {
     );
 
     // Only add images to formData if there are new images
-
     images.forEach((image) => formData.append("images", image));
 
     try {
@@ -80,9 +86,8 @@ const PostUpdate = ({ post, refreshPosts, onClose }) => {
       onClose();
     } catch (error) {
       console.error("Error updating post:", error);
-    }
-    finally{
-      setIsSaveLoading(false);  
+    } finally {
+      setIsSaveLoading(false);
     }
   };
 
@@ -111,6 +116,9 @@ const PostUpdate = ({ post, refreshPosts, onClose }) => {
               onChange={handleContentChange}
               required
             />
+            <div className="text-end">
+              {content.length}/{MAX_CONTENT_LENGTH}
+            </div>
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Danh mục:</Form.Label>

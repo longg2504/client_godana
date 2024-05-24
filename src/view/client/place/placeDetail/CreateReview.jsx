@@ -85,9 +85,10 @@ export default function CreateReview(prop) {
         });
       })
       .catch((error) => {
+        console.log(error.response.data.content, "error")
         Swal({
           title: "Thông báo!",
-          text: "Viết đánh giá thất bại!",
+          text: error.response.data.content,
           icon: "error",
           timer: 1000,
         });

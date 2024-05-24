@@ -70,6 +70,17 @@ export default function Body() {
   };
 
   const mapRef = useRef();
+  
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const { latitude, longitude } = position.coords;
+        setUserLocation([latitude, longitude]);
+      });
+    } else {
+      alert("Trình duyệt không hỗ trợ xác định vị trí.");
+    }
+  }, []);
 
   const getUserLocation = () => {
     setShowUserLocation(true);
@@ -128,16 +139,7 @@ export default function Body() {
     });
   };
 
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        const { latitude, longitude } = position.coords;
-        setUserLocation([latitude, longitude]);
-      });
-    } else {
-      alert("Trình duyệt không hỗ trợ xác định vị trí.");
-    }
-  }, []);
+ 
 
   useEffect(() => {
     if (placeList && placeList.length > 0) {
