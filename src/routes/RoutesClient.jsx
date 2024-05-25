@@ -8,6 +8,7 @@ import UserInfomation from '../view/client/user/UserInformation/UserInfomation';
 import PostBody from '../view/client/post/PostBody';
 import SignUp from '../view/client/auth/SignUp';
 import ChangePassword from '../view/client/user/ChangePassword';
+import NotFoundPage from '../view/client/NotFoundPage';
 
 export default function RoutesClient() {
   return (
@@ -20,6 +21,7 @@ export default function RoutesClient() {
         <Route path='/user/account-setting/user-infomation' element={<UserInfomation/>} />
         <Route path='user/account-setting/change-password' element={<ChangePassword/>} />
         <Route path='post' element={<PostBody/>} />
+        <Route path="*" element={<NotFoundPage />} /> {/* Add NotFound route */}
     </Routes>
   )
 }
