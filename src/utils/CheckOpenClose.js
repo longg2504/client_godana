@@ -28,17 +28,24 @@ export default function checkOpenClose(startTime, endTime) {
     var currentTimeInMinutes = currentHour * 60 + currentMinute;
     var startTimeInMinutes = startHour * 60 + startMinute;
     var endTimeInMinutes = endHour * 60 + endMinute;
-    ;
-    if(startTime == "00:00:00" && endTime == "23:59:00"){
-        return `Mở cả ngày`
+    
+    if ((startTime === "00:00:00" && endTime === "23:59:00") || (startTime === "00:00" && endTime === "23:59")) {
+        return `Mở cả ngày`;
     }
-    if(startTime == "00:00" && endTime == "23:59"){
-        return `Mở cả ngày`
-    }
-    // Kiểm tra xem thời gian hiện tại có nằm trong khoảng cho phép hay không
-    if (currentTimeInMinutes >= startTimeInMinutes && currentTimeInMinutes <= endTimeInMinutes) {
-        return `Mở cửa - Đóng cửa lúc: ${hourEnd + ':' + minuteEnd}`;
+
+    // Kiểm tra nếu giờ kết thúc nhỏ hơn giờ bắt đầu (qua đêm)
+    if (endTimeInMinutes < startTimeInMinutes) {
+        if (currentTimeInMinutes >= startTimeInMinutes || currentTimeInMinutes <= endTimeInMinutes) {
+            return `Mở cửa - Đóng cửa lúc: ${hourEnd}:${minuteEnd}`;
+        } else {
+            return `Đóng cửa - Mở cửa lúc: ${hourStart}:${minuteStart}`;
+        }
     } else {
-        return `Đóng cửa - Mở cửa lúc: ${hourStart + ':' + minuteStart}`;
+        // Kiểm tra giờ trong khoảng thời gian bình thường
+        if (currentTimeInMinutes >= startTimeInMinutes && currentTimeInMinutes <= endTimeInMinutes) {
+            return `Mở cửa - Đóng cửa lúc: ${hourEnd}:${minuteEnd}`;
+        } else {
+            return `Đóng cửa - Mở cửa lúc: ${hourStart}:${minuteStart}`;
+        }
     }
 }
