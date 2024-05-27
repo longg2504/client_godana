@@ -199,7 +199,7 @@ export default function PostCreation({ refreshPosts }) {
               </Form.Select>
             </Form.Group>
 
-            <div className="d-flex justify-content-between align-items-center">
+            <div className="d-flex justify-content-between align-items-center mb-5">
               <div>
                 <label htmlFor="image-upload-create" className="btn btn-light">
                   <FaPlus /> Thêm ảnh
@@ -222,6 +222,7 @@ export default function PostCreation({ refreshPosts }) {
                     position: "relative",
                     display: "inline-block",
                     marginRight: "10px",
+                    marginBottom: "5px"
                   }}
                 >
                   <img
