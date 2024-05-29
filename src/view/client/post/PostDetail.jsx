@@ -17,6 +17,8 @@ import PostDetailSlider from "./PostDetailSlider";
 import "./css/postDetail.css";
 import PostService from "../../../service/PostService";
 import Swal from "sweetalert";
+import { useNavigate } from "react-router-dom";
+
 
 function PostDetail({
   post,
@@ -31,7 +33,6 @@ function PostDetail({
     ? likedPosts.map((like) => like.post.id)
     : [];
   const isPostLiked = likedPostIds.includes(post ? post.id : -1);
-
   const [likeCount, setLikeCount] = useState(post ? post.like : 0);
   const [commentCount, setCommentCount] = useState(post ? post.comment : 0);
   const [isLiked, setIsLiked] = useState(isPostLiked);
@@ -47,6 +48,8 @@ function PostDetail({
   const userId = localStorage.getItem("id");
   const avatar = localStorage.getItem("avatar");
   const jwt = localStorage.getItem("jwt");
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     const getAllCommentParentByPost = async () => {
@@ -57,6 +60,15 @@ function PostDetail({
   }, [post.id]);
 
   const handleLike = (postId) => {
+    if (!jwt) {
+      Swal({
+        title: "Thông báo!",
+        text: "Vui lòng đăng nhập để thực hiện tính năng này",
+        icon: "error",
+        timer: 1000,
+      });
+      navigate("/login");
+    }
     handleLikeClick(postId);
     if (isLiked) {
       setLikeCount(likeCount - 1);
@@ -78,6 +90,7 @@ function PostDetail({
         icon: "error",
         timer: 1000,
       });
+      navigate("/login");
       return;
     }
 

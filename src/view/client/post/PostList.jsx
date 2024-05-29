@@ -119,6 +119,7 @@ const PostList = () => {
         icon: "error",
         timer: 1000,
       });
+      navigate("/login");
       return;
     }
 
