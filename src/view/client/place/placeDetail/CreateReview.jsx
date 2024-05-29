@@ -85,10 +85,10 @@ export default function CreateReview(prop) {
         });
       })
       .catch((error) => {
-        console.log(error.response.data.content, "error")
+        console.log(error, "error")
         Swal({
           title: "Thông báo!",
-          text: error.response.data.content,
+          text: error.response.data.content || error.response.data.message,
           icon: "error",
           timer: 1000,
         });

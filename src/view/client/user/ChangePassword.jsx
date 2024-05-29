@@ -37,6 +37,7 @@ export default function ChangePassword() {
       });
       reset(); // Resets the form fields after successful submission
     } catch (error) {
+      console.log(error, "error")
       Swal({
         title: "Lỗi khi cập nhật mật khẩu",
         text: error.response?.data?.message || "Failed to update password. Please try again.",

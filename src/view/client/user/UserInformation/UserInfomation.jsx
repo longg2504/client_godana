@@ -84,11 +84,17 @@ export default function UserInfomation() {
         });
       }
     } catch (error) {
+      console.log(error)
+      Swal({
+        title: "Thông báo!",
+        text: error.response.data.message,
+        icon: "error",
+        timer: 1000,
+      });
     } finally {
       setIsSaveLoading(false);
       if (fileInputRef.current && userInfo.avatar) {
         fileInputRef.current.value = "";
-        setCurrentAvatar(null);
       }
     }
   };
